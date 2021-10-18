@@ -1,8 +1,8 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name='site-configuration-client',
-    version='0.1.0',
+    version='0.1.1',
     description='Python client library for Site Configuration API',
     classifiers=[
         "Intended Audience :: Developers",
@@ -13,5 +13,10 @@ setup(
     install_requires=[
         "requests>=2.20.0",
     ],
+    entry_points={
+        'lms.djangoapp': [
+            'site_config_client = site_config_client.apps:SiteConfigApp',
+        ],
+    },
     url="https://github.com/appsembler/site-configuration-client"
 )
