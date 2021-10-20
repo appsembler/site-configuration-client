@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 from openedx.core.djangoapps.plugins.constants import (
-    PluginSettings, PluginURLs, ProjectType, SettingsType)
+    PluginSettings, ProjectType, SettingsType)
 
 
 class SiteConfigApp(AppConfig):
@@ -12,13 +12,6 @@ class SiteConfigApp(AppConfig):
     verbose_name = 'Site configuration API client and Open edX plugin.'
 
     plugin_app = {
-        PluginURLs.CONFIG: {
-                ProjectType.LMS: {
-                    PluginURLs.NAMESPACE: u'siteconfig',
-                    PluginURLs.REGEX: u'^siteconfig/',
-                }
-            },
-
         PluginSettings.CONFIG: {
             ProjectType.LMS: {
                 SettingsType.PRODUCTION: {
