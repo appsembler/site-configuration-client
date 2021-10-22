@@ -1,7 +1,6 @@
 from django.apps import AppConfig
 
 
-
 class SiteConfigApp(AppConfig):
     """
     Django and Open edX app configs.
