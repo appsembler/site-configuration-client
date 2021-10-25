@@ -2,7 +2,6 @@
 Tests for Client
 """
 import requests
-
 from site_config_client import Client
 
 
@@ -12,17 +11,17 @@ def test_client():
     bucket = "http://storage.googleapis.com/appsembler/site_config"
     c = Client(base_url=base,
                api_token=token,
-               read_only_base_url=bucket)
+               read_only_storage=bucket)
 
     assert c.base_url == base
     assert c.api_token == token
-    assert c.read_only_base_url == bucket
+    assert c.read_only_storage == bucket
 
 
 def test_url():
     c = Client(base_url="http://some-base-url",
                api_token="some-token",
-               read_only_base_url="http://some-bucket")
+               read_only_storage="http://some-bucket")
     site_endpoint = c.build_url('v1/site/')
     assert site_endpoint == "http://some-base-url/v1/site/"
 
