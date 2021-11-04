@@ -8,6 +8,7 @@ from google.api_core.exceptions import NotFound
 
 log = getLogger(__name__)
 
+
 class GoogleCloudStorage:
     """
     Allows Site Configuration Client to read configurations from
