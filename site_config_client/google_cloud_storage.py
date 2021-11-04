@@ -1,11 +1,12 @@
 """
 Google cloud read-only storage.
 """
-import logging as log
+from logging import getLogger
 
 from google.cloud import storage
 from google.api_core.exceptions import NotFound
 
+log = getLogger(__name__)
 
 class GoogleCloudStorage:
     """
