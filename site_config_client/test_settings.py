@@ -12,4 +12,4 @@ def root(*args):
     return join(abspath(dirname(__file__)), *args)
 
 
-sys.path.append(root('mocks'))
+sys.path.append(root('../mocks'))

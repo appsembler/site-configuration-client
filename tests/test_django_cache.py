@@ -1,21 +1,27 @@
 """
 Tests for Cache
 """
-import django
-from django.conf import settings
 
 from site_config_client.django_cache import DjangoCache
 
 
-def test_set_get():
-    settings.configure(
-        CACHES={
-            'default': {
-                'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            }
+def test_empty_get(settings):
+    settings.CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         }
-    )
-    django.setup()
+    }
+    cache = DjangoCache(cache_name='default')
+    cache_key = 'client.040e0ec3-2578-4fcf-b5db-030dadf68f30.live'
+    assert cache.get(key=cache_key) is None
+
+
+def test_set_get(settings):
+    settings.CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        }
+    }
 
     cache = DjangoCache(cache_name='default')
 

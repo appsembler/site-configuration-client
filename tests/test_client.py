@@ -1,9 +1,34 @@
 """
 Tests for Client
 """
+import pytest
 import requests
 
 from site_config_client import Client
+from site_config_client.exceptions import SiteConfigurationError
+
+
+SITES = {
+    "count": 2,
+    "results": [
+            {
+                "uuid": "77d4ee4e-6888-4965-b246-b8629ac65bce",
+                "domain_name": "croissant.edu",
+                "tier": "trial",
+                "always_active": "False",
+                "subscription_ends": "2021-10-31T16:44:45+0000",
+                "is_active": "True"
+            },
+            {
+                "uuid": "040e0ec3-2578-4fcf-b5db-030dadf68f30",
+                "domain_name": "test-site.com",
+                "tier": "trial",
+                "always_active": "False",
+                "subscription_ends": "2021-10-31T16:44:45+0000",
+                "is_active": "True"
+            }
+        ]
+}
 
 
 def test_client():
@@ -19,41 +44,34 @@ def test_client():
     assert c.read_only_base_url == bucket
 
 
-def test_url():
-    c = Client(base_url="http://some-base-url",
-               api_token="some-token",
-               read_only_base_url="http://some-bucket")
-    site_endpoint = c.build_url('v1/site/')
-    assert site_endpoint == "http://some-base-url/v1/site/"
+@pytest.fixture
+def site_config_client():
+    client = Client(
+                base_url="http://service",
+                api_token="some-token",
+                read_only_base_url="http://some-bucket",
+    )
+    return client
 
 
-def test_list_sites(requests_mock):
-    site_path = "http://127.0.0.1:8000/v1/site/"
-    sites = {
-        "count": 2,
-        "results": [
-                {
-                    "uuid": "77d4ee4e-6888-4965-b246-b8629ac65bce",
-                    "domain_name": "croissant.edu",
-                    "tier": "trial",
-                    "always_active": "False",
-                    "subscription_ends": "2021-10-31T16:44:45+0000",
-                    "is_active": "True"
-                },
-                {
-                    "uuid": "040e0ec3-2578-4fcf-b5db-030dadf68f30",
-                    "domain_name": "test-site.com",
-                    "tier": "trial",
-                    "always_active": "False",
-                    "subscription_ends": "2021-10-31T16:44:45+0000",
-                    "is_active": "True"
-                }
-            ]
-    }
-    requests_mock.get(site_path, json=sites, status_code=200)
-    r = requests.get(site_path)
-    assert r.json() == sites
-    assert r.status_code == 200
+def test_url(site_config_client):
+    site_endpoint = site_config_client.build_url('v1/site/')
+    assert site_endpoint == "http://service/v1/site/"
+
+
+def test_list_sites(site_config_client, requests_mock):
+    site_path = "http://service/v1/site/"
+    requests_mock.get(site_path, json=SITES, status_code=200)
+    response_sites = site_config_client.list_sites()
+    assert response_sites == SITES
+
+
+def test_list_sites_with_error(site_config_client, requests_mock):
+    site_path = "http://service/v1/site/"
+    requests_mock.get(site_path, json=SITES, status_code=404)
+
+    with pytest.raises(SiteConfigurationError):
+        site_config_client.list_sites()
 
 
 def test_list_active_sites(requests_mock):

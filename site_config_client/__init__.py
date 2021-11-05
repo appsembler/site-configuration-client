@@ -24,13 +24,13 @@ class Client:
         Returns a list of all Sites
         """
         response = requests.get(self.build_url('v1/site/'))
-        if response.status == 200:
+        if response.status_code == 200:
             return response.json()
         else:
             raise SiteConfigurationError((
                 'Something went wrong with the site configuration API '
                 '`v1/site/` with status_code="{}" body="{}"'
-            ).format(response.status, response.content))
+            ).format(response.status_code, response.content))
 
     def list_active_sites(self):
         """
@@ -40,13 +40,13 @@ class Client:
             "is_active": "True"
         }
         response = requests.get(self.build_url('v1/site/'), data=data)
-        if response.status == 200:
+        if response.status_code == 200:
             return response.json()
         else:
             raise SiteConfigurationError((
                 'Something went wrong with the site configuration API '
                 '`v1/site/?is_active=True` with status_code="{}" body="{}"'
-            ).format(response.status, response.content))
+            ).format(response.status_code, response.content))
 
     def get_backend_configs(self, site_uuid: Union[str, uuid.UUID],
                             status: str):
@@ -57,14 +57,14 @@ class Client:
         endpoint = 'v1/combined-configuration/backend/{}/{}/'.format(
             site_uuid, status)
         response = requests.get(self.build_url(endpoint))
-        if response.status == 200:
+        if response.status_code == 200:
             return response.json()
         else:
             raise SiteConfigurationError((
                 'Something went wrong with the site configuration API '
                 '`v1/combined-configuration/backend/` with '
                 'status_code="{}" body="{}"'
-            ).format(response.status, response.content))
+            ).format(response.status_code, response.content))
 
     def get_config(self, site_uuid: Union[str, uuid.UUID],
                    type: str, name: str, status: str):
@@ -78,13 +78,13 @@ class Client:
             "status": status
         }
         response = requests.get(self.build_url(endpoint), data=data)
-        if response.status == 200:
+        if response.status_code == 200:
             return response.json()
         else:
             raise SiteConfigurationError((
                 'Something went wrong with the site configuration API '
                 '`v1/configuration/` with status_code="{}" body="{}"'
-            ).format(response.status, response.content))
+            ).format(response.status_code, response.content))
 
     def override_configs(self, site_uuid: Union[str, uuid.UUID], configs):
         """
@@ -95,10 +95,10 @@ class Client:
         """
         endpoint = 'v0/configuration-override/{}/'.format(site_uuid)
         response = requests.put(self.build_url(endpoint), data=configs)
-        if response.status == 200:
+        if response.status_code == 200:
             return response.json()
         else:
             raise SiteConfigurationError((
                 'Something went wrong with the site configuration API '
                 '`v0/configuration-override/` with status_code="{}" body="{}"'
-            ).format(response.status, response.content))
+            ).format(response.status_code, response.content))
