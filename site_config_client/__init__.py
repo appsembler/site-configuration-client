@@ -7,13 +7,13 @@ from site_config_client.exceptions import SiteConfigurationError
 
 
 class Client:
-    def __init__(self, base_url, api_token, read_only_base_url):
+    def __init__(self, base_url, api_token, read_only_storage):
         """
         Instantiate a new API Client
         """
         self.base_url = base_url
         self.api_token = api_token
-        self.read_only_base_url = read_only_base_url
+        self.read_only_storage = read_only_storage
 
     def build_url(self, endpoint):
         full_path = urljoin(self.base_url, endpoint)
@@ -39,7 +39,8 @@ class Client:
         data = {
             "is_active": "True"
         }
-        response = requests.get(self.build_url('v1/site/'), data=data)
+        response = requests.get(
+            self.build_url('v1/site/?is_active=True'), data=data)
         if response.status_code == 200:
             return response.json()
         else:
