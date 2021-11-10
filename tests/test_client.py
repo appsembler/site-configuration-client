@@ -190,7 +190,7 @@ def test_get_backend_configs_cache(requests_mock, site_config_client_cache):
         'http://service/v1/combined-configuration/backend/{}/draft/'
         .format(PARAMS['uuid']))
     cache_key = 'site_config_client.{}.{}'.format(PARAMS['uuid'], 'draft')
-    config  = DjangoCache(
+    config = DjangoCache(
         cache_name=site_config_client_cache.cache).get(key=cache_key)
     assert config is None, 'Cache does not exist'
 
