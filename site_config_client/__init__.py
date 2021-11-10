@@ -1,9 +1,11 @@
+import json
 import requests
-import uuid
 from typing import Union
+import uuid
 from urllib.parse import urljoin
 
-from site_config_client.exceptions import SiteConfigurationError
+from .django_cache import DjangoCache
+from .exceptions import SiteConfigurationError
 
 
 class Client:
@@ -56,18 +58,46 @@ class Client:
         """
         Returns a combination of Site information and `live` or `draft`
         Configurations (backend secrets included)
+
+        [Client Configuration]
+        - Django Cache
+            - if cache key exists: return config from cache
+            - if cache key does not exist: call endpoint to get config, set
+              cache with config, return config
+        - Google Cloud Storage
+            - get config from GCS bucket and return config
+        - Django Cache + Google Cloud Storage
+            - set cache with config from GCS bucket and return config
+        - Neither Django Cache or Google Cloud Storage
+            - return config from endpoint
         """
-        endpoint = 'v1/combined-configuration/backend/{}/{}/'.format(
-            site_uuid, status)
-        response = requests.get(self.build_url(endpoint))
-        if response.status_code == 200:
-            return response.json()
+        cache_key = 'site_config_client.{}.{}'.format(site_uuid, status)
+        if self.cache:
+            config = DjangoCache(cache_name=self.cache).get(key=cache_key)
+            if config:
+                return config
+
+        if self.read_only_storage:
+            config = self.read_only_storage.read((
+                'v1/combined-configuration/backend/{}-{}.json'
+                ).format(site_uuid, status))
+            config = json.loads(config)
         else:
-            raise SiteConfigurationError((
-                'Something went wrong with the site configuration API '
-                '`v1/combined-configuration/backend/` with '
-                'status_code="{}" body="{}"'
-            ).format(response.status_code, response.content))
+            endpoint = 'v1/combined-configuration/backend/{}/{}/'.format(
+                site_uuid, status)
+            response = requests.get(self.build_url(endpoint))
+            if response.status_code == 200:
+                config = response.json()
+            else:
+                raise SiteConfigurationError((
+                    'Something went wrong with the site configuration API '
+                    '`v1/combined-configuration/backend/` with '
+                    'status_code="{}" body="{}"'
+                ).format(response.status_code, response.content))
+
+        if self.cache:
+            DjangoCache(cache_name=self.cache).set(cache_key, config)
+        return config
 
     def get_config(self, site_uuid: Union[str, uuid.UUID],
                    type: str, name: str, status: str):
