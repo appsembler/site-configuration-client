@@ -4,6 +4,7 @@ Tests for Client
 import pytest
 
 from site_config_client import Client
+from site_config_client.django_cache import DjangoCache
 from site_config_client.exceptions import SiteConfigurationError
 
 
@@ -103,7 +104,6 @@ def site_config_client():
     client = Client(
                 base_url="http://service",
                 api_token="some-token",
-                read_only_storage=None,
     )
     return client
 
@@ -165,6 +165,30 @@ def test_get_backend_configs_error(requests_mock, site_config_client):
     with pytest.raises(SiteConfigurationError):
         site_config_client.get_backend_configs(
             site_uuid=PARAMS['uuid'], status='draft')
+
+
+def test_get_backend_configs_cache(requests_mock, site_config_client):
+    site_config_client.cache = DjangoCache(cache_name='default')
+    backend_draft_configs_path = (
+        'http://service/v1/combined-configuration/backend/{}/draft/'
+        .format(PARAMS['uuid']))
+    cache_key = 'site_config_client.{}.{}'.format(PARAMS['uuid'], 'draft')
+    config = site_config_client.cache.get(key=cache_key)
+    assert config is None, 'Cache does not exist'
+
+    requests_mock.get(backend_draft_configs_path,
+                      json=CONFIGS, status_code=200)
+
+    # First read without cache
+    fresh_configs = site_config_client.get_backend_configs(
+        site_uuid=PARAMS['uuid'], status='draft')
+    cache_config_value = site_config_client.cache.get(key=cache_key)
+    assert cache_config_value == fresh_configs, 'Cache key has been set'
+
+    # Second read with cache
+    cached_configs = site_config_client.get_backend_configs(
+        site_uuid=PARAMS['uuid'], status='draft')
+    assert cached_configs == fresh_configs, 'Reading from cache returns the same result'
 
 
 def test_get_config(requests_mock, site_config_client):

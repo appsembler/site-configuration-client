@@ -1,9 +1,9 @@
 import requests
-import uuid
 from typing import Union
+import uuid
 from urllib.parse import urljoin
 
-from site_config_client.exceptions import SiteConfigurationError
+from .exceptions import SiteConfigurationError
 
 
 class Client:
@@ -56,18 +56,34 @@ class Client:
         """
         Returns a combination of Site information and `live` or `draft`
         Configurations (backend secrets included)
+
+        [Client Configuration]
+        - Django Cache
+            - if cache key exists: return config from cache
+            - if cache key does not exist: call endpoint to get config, set
+              cache with config, return config
         """
+        cache_key = 'site_config_client.{}.{}'.format(site_uuid, status)
+        if self.cache:
+            config = self.cache.get(key=cache_key)
+            if config:
+                return config
+
         endpoint = 'v1/combined-configuration/backend/{}/{}/'.format(
             site_uuid, status)
         response = requests.get(self.build_url(endpoint))
         if response.status_code == 200:
-            return response.json()
+            config = response.json()
         else:
             raise SiteConfigurationError((
                 'Something went wrong with the site configuration API '
                 '`v1/combined-configuration/backend/` with '
                 'status_code="{}" body="{}"'
             ).format(response.status_code, response.content))
+
+        if self.cache:
+            self.cache.set(cache_key, config)
+        return config
 
     def get_config(self, site_uuid: Union[str, uuid.UUID],
                    type: str, name: str, status: str):
