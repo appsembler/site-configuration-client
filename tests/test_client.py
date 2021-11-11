@@ -191,7 +191,6 @@ def test_get_backend_configs_cache(requests_mock, site_config_client):
     assert cached_configs == fresh_configs, 'Reading from cache returns the same result'
 
 
-
 def test_get_config(requests_mock, site_config_client):
     config_path = "http://service/v1/configuration/{}/".format(PARAMS['uuid'])
     requests_mock.get(config_path,
