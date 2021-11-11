@@ -104,23 +104,6 @@ def site_config_client():
     client = Client(
                 base_url="http://service",
                 api_token="some-token",
-                read_only_storage=None,
-    )
-    return client
-
-
-@pytest.fixture
-def site_config_client_cache(settings):
-    settings.CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        }
-    }
-    client = Client(
-                base_url="http://service",
-                api_token="some-token",
-                read_only_storage=None,
-                cache="default"
     )
     return client
 
@@ -184,23 +167,29 @@ def test_get_backend_configs_error(requests_mock, site_config_client):
             site_uuid=PARAMS['uuid'], status='draft')
 
 
-def test_get_backend_configs_cache(requests_mock, site_config_client_cache):
-
+def test_get_backend_configs_cache(requests_mock, site_config_client):
+    site_config_client.cache = DjangoCache(cache_name='default')
     backend_draft_configs_path = (
         'http://service/v1/combined-configuration/backend/{}/draft/'
         .format(PARAMS['uuid']))
     cache_key = 'site_config_client.{}.{}'.format(PARAMS['uuid'], 'draft')
-    config = DjangoCache(
-        cache_name=site_config_client_cache.cache).get(key=cache_key)
+    config = site_config_client.cache.get(key=cache_key)
     assert config is None, 'Cache does not exist'
 
     requests_mock.get(backend_draft_configs_path,
                       json=CONFIGS, status_code=200)
-    response_configs = site_config_client_cache.get_backend_configs(
+
+    # First read without cache
+    fresh_configs = site_config_client.get_backend_configs(
         site_uuid=PARAMS['uuid'], status='draft')
-    cache_config_value = DjangoCache(
-        cache_name=site_config_client_cache.cache).get(key=cache_key)
-    assert cache_config_value == response_configs, 'Cache key has been set'
+    cache_config_value = site_config_client.cache.get(key=cache_key)
+    assert cache_config_value == fresh_configs, 'Cache key has been set'
+
+    # Second read with cache
+    cached_configs = site_config_client.get_backend_configs(
+        site_uuid=PARAMS['uuid'], status='draft')
+    assert cached_configs == fresh_configs, 'Reading from cache returns the same result'
+
 
 
 def test_get_config(requests_mock, site_config_client):
