@@ -167,6 +167,7 @@ def test_get_backend_configs_error(requests_mock, site_config_client):
             site_uuid=PARAMS['uuid'], status='draft')
 
 
+@pytest.mark.django
 def test_get_backend_configs_cache(requests_mock, site_config_client):
     site_config_client.cache = DjangoCache(cache_name='default')
     backend_draft_configs_path = (
