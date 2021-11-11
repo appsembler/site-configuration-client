@@ -7,13 +7,15 @@ from site_config_client.exceptions import SiteConfigurationError
 
 
 class Client:
-    def __init__(self, base_url, api_token, read_only_storage):
+    def __init__(self, base_url, api_token,
+                 read_only_storage=None, cache=None):
         """
         Instantiate a new API Client
         """
         self.base_url = base_url
         self.api_token = api_token
         self.read_only_storage = read_only_storage
+        self.cache = cache
 
     def build_url(self, endpoint):
         full_path = urljoin(self.base_url, endpoint)
