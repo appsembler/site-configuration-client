@@ -1,30 +1,30 @@
 """
 Tests for Cache
 """
+import pytest
 
-from site_config_client.django_cache import DjangoCache
 
+@pytest.fixture
+def django_cache_adapter(settings):
+    # Local import to avoid test failures for non-openedx tests
+    from site_config_client.django_cache import DjangoCache
 
-def test_empty_get(settings):
     settings.CACHES = {
         'default': {
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         }
     }
-    cache = DjangoCache(cache_name='default')
+    return DjangoCache(cache_name='default')
+
+
+@pytest.mark.django
+def test_empty_get(django_cache_adapter):
     cache_key = 'client.040e0ec3-2578-4fcf-b5db-030dadf68f30.live'
-    assert cache.get(key=cache_key) is None
+    assert django_cache_adapter.get(key=cache_key) is None
 
 
-def test_set_get(settings):
-    settings.CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        }
-    }
-
-    cache = DjangoCache(cache_name='default')
-
+@pytest.mark.django
+def test_set_get(django_cache_adapter):
     configs = {
      "site": {
             "uuid": "77d4ee4e-6888-4965-b246-b8629ac65bce",
@@ -67,5 +67,5 @@ def test_set_get(settings):
             ]}
     }
     cache_key = 'client.040e0ec3-2578-4fcf-b5db-030dadf68f30.live'
-    cache.set(key=cache_key, value=configs)
-    assert cache.get(key=cache_key) == configs
+    django_cache_adapter.set(key=cache_key, value=configs)
+    assert django_cache_adapter.get(key=cache_key) == configs

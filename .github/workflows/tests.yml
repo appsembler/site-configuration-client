@@ -16,6 +16,8 @@ jobs:
         tox-env:
           - flake8
           - py3
+          - py3-django
+          - py3-openedx
 
     steps:
       - uses: actions/checkout@v2
