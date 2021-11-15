@@ -18,6 +18,7 @@ jobs:
           - py3
           - py3-django
           - py3-openedx
+          - bandit
 
     steps:
       - uses: actions/checkout@v2
