@@ -9,21 +9,13 @@ class SiteConfigApp(AppConfig):
     label = 'site_config_client'
     verbose_name = 'Site configuration API client and Open edX plugin.'
 
-    @property
-    def plugin_app(self):
-        """
-        Open edX-specific configurations.
-
-        This is not used by Django.
-        """
-        # Import locally to allow non-Open edX use.
-        from openedx.core.djangoapps.plugins.constants import (
+    from openedx.core.djangoapps.plugins.constants import (
             PluginSettings,
             ProjectType,
             SettingsType,
         )
 
-        return {
+    plugin_app = {
             PluginSettings.CONFIG: {
                 ProjectType.LMS: {
                     SettingsType.PRODUCTION: {
@@ -31,5 +23,5 @@ class SiteConfigApp(AppConfig):
                     SettingsType.COMMON: {
                         PluginSettings.RELATIVE_PATH: 'settings.common'},
                 }
-            },
-        }
+            }
+    }
