@@ -1,5 +1,15 @@
 from django.apps import AppConfig
 
+try:
+    from openedx.core.djangoapps.plugins.constants import (
+        PluginSettings,
+        ProjectType,
+        SettingsType,
+    )
+    OPENEDX_ENVIRONMENT = True
+except ImportError:
+    OPENEDX_ENVIRONMENT = False
+
 
 class SiteConfigApp(AppConfig):
     """
@@ -9,26 +19,15 @@ class SiteConfigApp(AppConfig):
     label = 'site_config_client'
     verbose_name = 'Site configuration API client and Open edX plugin.'
 
-    @property
-    def plugin_app(self):
-        """
-        Open edX-specific configurations.
-        This is not used by Django.
-        """
-        # Import locally to allow non-Open edX use.
-        from openedx.core.djangoapps.plugins.constants import (
-            PluginSettings,
-            ProjectType,
-            SettingsType,
-        )
-
-        return {
+    if OPENEDX_ENVIRONMENT:
+        # Open edX-specific configurations. This is not used by Django-only environment.
+        plugin_app = {
             PluginSettings.CONFIG: {
                 ProjectType.LMS: {
                     SettingsType.PRODUCTION: {
                         PluginSettings.RELATIVE_PATH: 'settings.production'},
                     SettingsType.COMMON: {
                         PluginSettings.RELATIVE_PATH: 'settings.common'},
-                }
+                },
             },
         }
