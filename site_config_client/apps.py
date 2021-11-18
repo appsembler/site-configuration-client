@@ -13,7 +13,6 @@ class SiteConfigApp(AppConfig):
     def plugin_app(self):
         """
         Open edX-specific configurations.
-
         This is not used by Django.
         """
         # Import locally to allow non-Open edX use.
