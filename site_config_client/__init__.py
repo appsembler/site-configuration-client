@@ -101,7 +101,7 @@ class Client:
         }
         auth_headers = {'Authorization': 'Token {}'.format(self.api_token)}
         response = requests.get(self.build_url(endpoint),
-                                headers=auth_headers, data=data)
+                                headers=auth_headers, params=data)
         if response.status_code == 200:
             return response.json()
         else:
