@@ -113,11 +113,21 @@ def test_url(site_config_client):
     assert site_endpoint == "http://service/v1/site/"
 
 
+def test_client_has_token(site_config_client):
+    assert site_config_client.api_token, 'Client should have an API token'
+
+
 def test_list_sites(site_config_client, requests_mock):
+    headers = {'Authorization': '{}'.
+               format(site_config_client.api_token)}
+
     site_path = "http://service/v1/site/"
-    requests_mock.get(site_path, json=SITES, status_code=200)
+    requests_mock.get(site_path, json=SITES, headers=headers, status_code=200)
     response_sites = site_config_client.list_sites()
     assert response_sites == SITES
+    history = requests_mock.request_history[0]
+    assert history.headers.get("Authorization") == "Token some-token", (
+        "API Token passed in Authorization header")
 
 
 def test_list_sites_with_error(site_config_client, requests_mock):
@@ -129,10 +139,17 @@ def test_list_sites_with_error(site_config_client, requests_mock):
 
 
 def test_list_active_sites(site_config_client, requests_mock):
+    headers = {'Authorization': '{}'.
+               format(site_config_client.api_token)}
+
     active_sites_path = "http://service/v1/site/?is_active=True"
-    requests_mock.get(active_sites_path, json=SITES, status_code=200)
+    requests_mock.get(active_sites_path, json=SITES, headers=headers,
+                      status_code=200)
     response_active_sites = site_config_client.list_active_sites()
     assert response_active_sites == SITES
+    history = requests_mock.request_history[0]
+    assert history.headers.get("Authorization") == "Token some-token", (
+        "API Token passed in Authorization header")
 
 
 def test_list_active_sites_error(site_config_client, requests_mock):
@@ -144,15 +161,21 @@ def test_list_active_sites_error(site_config_client, requests_mock):
 
 
 def test_get_backend_configs(requests_mock, site_config_client):
+    headers = {'Authorization': '{}'.
+               format(site_config_client.api_token)}
+
     backend_draft_configs_path = (
         'http://service/v1/combined-configuration/backend/{}/draft/'
         .format(PARAMS['uuid']))
     requests_mock.get(backend_draft_configs_path,
-                      json=CONFIGS, status_code=200)
+                      json=CONFIGS, headers=headers, status_code=200)
     response_configs = site_config_client.get_backend_configs(
         site_uuid=PARAMS['uuid'], status='draft')
     assert response_configs == CONFIGS, (
         'Neither cache nor google cloud storage configured')
+    history = requests_mock.request_history[0]
+    assert history.headers.get("Authorization") == "Token some-token", (
+        "API Token passed in Authorization header")
 
 
 def test_get_backend_configs_error(requests_mock, site_config_client):
@@ -193,15 +216,21 @@ def test_get_backend_configs_cache(requests_mock, site_config_client):
 
 
 def test_get_config(requests_mock, site_config_client):
+    headers = {'Authorization': '{}'.
+               format(site_config_client.api_token)}
+
     config_path = "http://service/v1/configuration/{}/".format(PARAMS['uuid'])
-    requests_mock.get(config_path,
-                      json=SINGLE_CONFIG, status_code=200)
+    requests_mock.get(config_path, json=SINGLE_CONFIG, headers=headers,
+                      status_code=200)
     response_configs = site_config_client.get_config(
         site_uuid=PARAMS['uuid'],
         type="setting",
         name="PLATFORM_NAME",
         status="live")
     assert response_configs == SINGLE_CONFIG
+    history = requests_mock.request_history[0]
+    assert history.headers.get("Authorization") == "Token some-token", (
+        "API Token passed in Authorization header")
 
 
 def test_get_config_error(requests_mock, site_config_client):
@@ -219,16 +248,23 @@ def test_get_config_error(requests_mock, site_config_client):
 
 
 def test_override_configs(requests_mock, site_config_client):
+    headers = {'Authorization': '{}'.
+               format(site_config_client.api_token)}
+
     override_path = (
         "http://service/v0/configuration-override/{}/"
         .format(PARAMS['uuid']))
     success_response = {
         "developer_message": "Configurations has been overriden successfully."
         }
-    requests_mock.put(override_path, json=success_response, status_code=200)
+    requests_mock.put(override_path, json=success_response,
+                      headers=headers, status_code=200)
     override_response = site_config_client.override_configs(
         site_uuid=PARAMS['uuid'], configs=OVERRIDE_CONFIGS)
     assert override_response == success_response
+    history = requests_mock.request_history[0]
+    assert history.headers.get("Authorization") == "Token some-token", (
+        "API Token passed in Authorization header")
 
 
 def test_override_configs_error(requests_mock, site_config_client):

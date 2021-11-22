@@ -1,3 +1,4 @@
+import json
 import requests
 from typing import Union
 import uuid
@@ -25,7 +26,9 @@ class Client:
         """
         Returns a list of all Sites
         """
-        response = requests.get(self.build_url('v1/site/'))
+        auth_headers = {'Authorization': 'Token {}'.format(self.api_token)}
+        response = requests.get(self.build_url('v1/site/'),
+                                headers=auth_headers)
         if response.status_code == 200:
             return response.json()
         else:
@@ -38,11 +41,9 @@ class Client:
         """
         Returns a list of all active Sites
         """
-        data = {
-            "is_active": "True"
-        }
-        response = requests.get(
-            self.build_url('v1/site/?is_active=True'), data=data)
+        auth_headers = {'Authorization': 'Token {}'.format(self.api_token)}
+        response = requests.get(self.build_url('v1/site/?is_active=True'),
+                                headers=auth_headers)
         if response.status_code == 200:
             return response.json()
         else:
@@ -71,7 +72,9 @@ class Client:
 
         endpoint = 'v1/combined-configuration/backend/{}/{}/'.format(
             site_uuid, status)
-        response = requests.get(self.build_url(endpoint))
+        auth_headers = {'Authorization': 'Token {}'.format(self.api_token)}
+        response = requests.get(self.build_url(endpoint),
+                                headers=auth_headers)
         if response.status_code == 200:
             config = response.json()
         else:
@@ -96,7 +99,9 @@ class Client:
             "name": name,
             "status": status
         }
-        response = requests.get(self.build_url(endpoint), data=data)
+        auth_headers = {'Authorization': 'Token {}'.format(self.api_token)}
+        response = requests.get(self.build_url(endpoint),
+                                headers=auth_headers, params=data)
         if response.status_code == 200:
             return response.json()
         else:
@@ -113,7 +118,11 @@ class Client:
         rollout.
         """
         endpoint = 'v0/configuration-override/{}/'.format(site_uuid)
-        response = requests.put(self.build_url(endpoint), data=configs)
+        auth_headers = {'Authorization': 'Token {}'.format(self.api_token),
+                        'content-type': 'application/json'}
+        response = requests.put(self.build_url(endpoint),
+                                data=json.dumps(configs),
+                                headers=auth_headers)
         if response.status_code == 200:
             return response.json()
         else:
