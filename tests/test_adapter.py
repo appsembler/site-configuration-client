@@ -53,7 +53,8 @@ def test_adapater(settings):
     and test the return values of:
      `get_value`,  `get_amc_v1_theme_css_variables`, `get_amc_v1_page`
     '''
-    from site_config_client.openedx import adapter
+    # from site_config_client.openedx import adapter
+    from site_config_client.settings import adapter
 
     uuid = "77d4ee4e-6888-4965"
 
