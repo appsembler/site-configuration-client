@@ -6,7 +6,6 @@ import pytest
 @pytest.mark.openedx
 def test_plugin_settings(client):
     # Local import to avoid test failures for non-openedx tests
-    # from site_config_client.openedx.common import plugin_settings
     from site_config_client.settings.common import plugin_settings
 
     settings = mock.Mock(
