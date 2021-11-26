@@ -1,3 +1,5 @@
+[![CI](https://github.com/appsembler/site-configuration-client/actions/workflows/tests.yml/badge.svg)](https://github.com/appsembler/site-configuration-client/actions/workflows/tests.yml)
+
 # Site Configuration Client
 REST API client for the Site Configuration service.
 
