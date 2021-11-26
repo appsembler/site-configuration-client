@@ -25,9 +25,9 @@ class SiteConfigApp(AppConfig):
             PluginSettings.CONFIG: {
                 ProjectType.LMS: {
                     SettingsType.PRODUCTION: {
-                        PluginSettings.RELATIVE_PATH: 'settings.production'},
-                    SettingsType.COMMON: {
-                        PluginSettings.RELATIVE_PATH: 'settings.common'},
+                        PluginSettings.RELATIVE_PATH: 'openedx.settings.production'},
+                    SettingsType.TEST: {
+                        PluginSettings.RELATIVE_PATH: 'openedx.settings.test'},
                 },
             },
         }
