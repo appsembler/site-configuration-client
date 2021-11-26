@@ -1,5 +1,5 @@
 """
-Common settings for the Open edX
+Production settings for the Open edX
 """
 
 from site_config_client import Client
@@ -8,6 +8,10 @@ from site_config_client.google_cloud_storage import GoogleCloudStorage
 
 
 def plugin_settings(settings):
+    """
+    Production and devstack settings for Site Configuration API Client.
+    """
+
     read_only_storage = GoogleCloudStorage(
         settings.SITE_CONFIG_READ_ONLY_BUCKET)
     cache = DjangoCache(
