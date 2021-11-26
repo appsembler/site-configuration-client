@@ -1,8 +1,8 @@
 """
 Tests for GoogleCloudStorage
 """
-import mock
-from mock import Mock
+
+from unittest.mock import patch, Mock
 from google.api_core.exceptions import NotFound
 
 from site_config_client.google_cloud_storage import GoogleCloudStorage
@@ -17,7 +17,7 @@ def get_mock_gcp_client(mock_blob):
     return mock_client
 
 
-@mock.patch('google.cloud.storage.Client')
+@patch('google.cloud.storage.Client')
 def test_gcp_storage(client_cls):
     mock_blob = Mock()
     mock_blob.download_as_bytes.return_value = b'{"name": "my_site"}'
@@ -29,7 +29,7 @@ def test_gcp_storage(client_cls):
     assert content == '{"name": "my_site"}'
 
 
-@mock.patch('google.cloud.storage.Client')
+@patch('google.cloud.storage.Client')
 def test_gcp_storage_not_found(client_cls):
     mock_blob = Mock()
     mock_blob.download_as_bytes.side_effect = NotFound('file not found')

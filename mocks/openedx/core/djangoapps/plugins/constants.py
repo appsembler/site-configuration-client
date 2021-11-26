@@ -5,7 +5,7 @@ Mocks to make the plugin app works during tests
 without being concerned to actually test the plugin configs.
 """
 
-from mock import Mock
+from unittest.mock import Mock
 
 # Minimal mocks to reduce test maintenance costs.
 SettingsType = Mock()
