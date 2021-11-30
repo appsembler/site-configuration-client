@@ -13,7 +13,7 @@ PWD = os.path.abspath(os.path.dirname(__file__))
 if __name__ == '__main__':
     os.environ.setdefault(
         'DJANGO_SETTINGS_MODULE',
-        'site_config_client.test_settings'
+        'test_settings'
     )
     sys.path.append(PWD)
     try:
