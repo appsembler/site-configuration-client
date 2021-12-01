@@ -53,21 +53,21 @@ def test_adapater(settings):
     and test the return values of:
      `get_value`,  `get_amc_v1_theme_css_variables`, `get_amc_v1_page`
     '''
-    from site_config_client.openedx import adapter
-
-    uuid = "77d4ee4e-6888-4965"
+    from site_config_client.openedx.adapter import SiteConfigAdapter
 
     mock = Mock()
     mock.get_backend_configs.return_value = CONFIGS
     settings.SITE_CONFIG_CLIENT = mock
-    assert adapter.get_backend_config(uuid) == CONFIGS
+    adapter = SiteConfigAdapter("77d4ee4e-6888-4965")
 
-    setting_platform_name = adapter.get_value(uuid, 'PLATFORM_NAME', None)
+    assert adapter.get_backend_configs() == CONFIGS
+
+    setting_platform_name = adapter.get_value('PLATFORM_NAME', None)
     assert setting_platform_name == CONFIGS['configuration']['setting']['PLATFORM_NAME']
-    assert adapter.get_value(uuid, 'SEGMENT_KEY') == 'so secret'
+    assert adapter.get_value('SEGMENT_KEY') == 'so secret'
 
-    css_vars = adapter.get_amc_v1_theme_css_variables(uuid)
+    css_vars = adapter.get_amc_v1_theme_css_variables()
     assert css_vars == CONFIGS['configuration']['css']
 
-    privacy_page_vars = adapter.get_amc_v1_page(uuid, 'privacy')
+    privacy_page_vars = adapter.get_amc_v1_page('privacy')
     assert privacy_page_vars == CONFIGS['configuration']['page']['privacy']
