@@ -43,7 +43,7 @@ class SiteConfigAdapter:
         # NOTE: This function assumes that all varialbes are compativle with v1 theme.
         return openedx_theme_compatible_css_vars
 
-    def get_amc_v1_page(self, page_name):
+    def get_amc_v1_page(self, page_name, default=None):
         config = self.get_backend_configs()['configuration']
-        openedx_theme_compatible_page_vars = config['page'][page_name]
-        return openedx_theme_compatible_page_vars
+        openedx_theme_compatible_page_content = config['page'].get(page_name, default)
+        return openedx_theme_compatible_page_content

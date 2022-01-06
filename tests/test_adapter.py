@@ -71,3 +71,8 @@ def test_adapater(settings):
 
     privacy_page_vars = adapter.get_amc_v1_page('privacy')
     assert privacy_page_vars == CONFIGS['configuration']['page']['privacy']
+
+    assert adapter.get_amc_v1_page('non_existent') is None, 'Should default to None'
+    assert adapter.get_amc_v1_page('non_existent', {'title': 'default'}) == {
+        'title': 'default',
+    }, 'Should has a default'
