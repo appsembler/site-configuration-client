@@ -22,6 +22,25 @@ class Client:
         full_path = urljoin(self.base_url, endpoint)
         return full_path
 
+    def create_site(self, domain_name, site_uuid=None):
+        """
+        Create a new site.
+        """
+        params = {'domain_name': domain_name}
+        if site_uuid:
+            params['uuid'] = site_uuid
+
+        auth_headers = {'Authorization': 'Token {}'.format(self.api_token)}
+        response = requests.post(self.build_url('v1/site/'),
+                                 headers=auth_headers, json=params)
+        if response.status_code == 201:
+            return response.json()
+        else:
+            raise SiteConfigurationError((
+                'Something went wrong with the site configuration API '
+                '`v1/site/` with status_code="{}" body="{}"'
+            ).format(response.status_code, response.content))
+
     def list_sites(self):
         """
         Returns a list of all Sites
