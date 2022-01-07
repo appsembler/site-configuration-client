@@ -108,11 +108,6 @@ def site_config_client():
     return client
 
 
-def test_url(site_config_client):
-    site_endpoint = site_config_client.build_url('v1/site/')
-    assert site_endpoint == "http://service/v1/site/"
-
-
 def test_client_has_token(site_config_client):
     assert site_config_client.api_token, 'Client should have an API token'
 
