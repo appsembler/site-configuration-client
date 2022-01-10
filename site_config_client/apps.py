@@ -7,8 +7,8 @@ try:
         SettingsType,
     )
     OPENEDX_ENVIRONMENT = True
-except ImportError:
-    OPENEDX_ENVIRONMENT = False
+except ImportError:  # pragma: no cover
+    OPENEDX_ENVIRONMENT = False  # pragma: no cover
 
 
 class SiteConfigApp(AppConfig):

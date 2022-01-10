@@ -1,4 +1,3 @@
-import json
 import requests
 from typing import Union
 import uuid
@@ -9,7 +8,7 @@ from .exceptions import SiteConfigurationError
 
 class Client:
     def __init__(self, base_url, api_token,
-                 read_only_storage=None, cache=None):
+                 read_only_storage=None, cache=None, request_timeout=30):
         """
         Instantiate a new API Client
         """
@@ -17,40 +16,56 @@ class Client:
         self.api_token = api_token
         self.read_only_storage = read_only_storage
         self.cache = cache
+        self.request_timeout = request_timeout,
 
-    def build_url(self, endpoint):
-        full_path = urljoin(self.base_url, endpoint)
-        return full_path
+    def request(self, method, url_path, success_status_code=200, **kwargs):
+        """
+        Send requests to the Site Configuration service and handle errors.
+
+        Sets timeout and accepts a relative URL.
+        """
+        headers = {'Authorization': 'Token {}'.format(self.api_token)}
+        response = requests.request(
+            method=method,
+            url=urljoin(self.base_url, url_path),
+            timeout=self.request_timeout,
+            headers=headers,
+            **kwargs
+        )
+
+        if response.status_code == success_status_code:
+            return response.json()
+        else:
+            raise SiteConfigurationError((
+                'Something went wrong with the site configuration API '
+                '`{path}` with status_code="{status_code}" body="{body}"'
+            ).format(
+                path=url_path,
+                status_code=response.status_code,
+                body=response.content,
+            ))
+
+    def create_site(self, domain_name, site_uuid=None):
+        """
+        Create a new site.
+        """
+        params = {'domain_name': domain_name}
+        if site_uuid:
+            params['uuid'] = site_uuid
+
+        return self.request('post', 'v1/site/', success_status_code=201, json=params)
 
     def list_sites(self):
         """
         Returns a list of all Sites
         """
-        auth_headers = {'Authorization': 'Token {}'.format(self.api_token)}
-        response = requests.get(self.build_url('v1/site/'),
-                                headers=auth_headers)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise SiteConfigurationError((
-                'Something went wrong with the site configuration API '
-                '`v1/site/` with status_code="{}" body="{}"'
-            ).format(response.status_code, response.content))
+        return self.request('get', 'v1/site/')
 
     def list_active_sites(self):
         """
         Returns a list of all active Sites
         """
-        auth_headers = {'Authorization': 'Token {}'.format(self.api_token)}
-        response = requests.get(self.build_url('v1/site/?is_active=True'),
-                                headers=auth_headers)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise SiteConfigurationError((
-                'Something went wrong with the site configuration API '
-                '`v1/site/?is_active=True` with status_code="{}" body="{}"'
-            ).format(response.status_code, response.content))
+        return self.request('get', 'v1/site/?is_active=True')
 
     def get_backend_configs(self, site_uuid: Union[str, uuid.UUID],
                             status: str):
@@ -70,19 +85,10 @@ class Client:
             if config:
                 return config
 
-        endpoint = 'v1/combined-configuration/backend/{}/{}/'.format(
-            site_uuid, status)
-        auth_headers = {'Authorization': 'Token {}'.format(self.api_token)}
-        response = requests.get(self.build_url(endpoint),
-                                headers=auth_headers)
-        if response.status_code == 200:
-            config = response.json()
-        else:
-            raise SiteConfigurationError((
-                'Something went wrong with the site configuration API '
-                '`v1/combined-configuration/backend/` with '
-                'status_code="{}" body="{}"'
-            ).format(response.status_code, response.content))
+        api_endpoint = 'v1/combined-configuration/backend/{}/{}/'.format(
+            site_uuid, status
+        )
+        config = self.request('get', url_path=api_endpoint)
 
         if self.cache:
             self.cache.set(cache_key, config)
@@ -93,22 +99,12 @@ class Client:
         """
         Returns a single configuration object for Site
         """
-        endpoint = 'v1/configuration/{}/'.format(site_uuid)
-        data = {
+        api_endpoint = 'v1/configuration/{}/'.format(site_uuid)
+        return self.request('get', url_path=api_endpoint, params={
             "type": type,
             "name": name,
             "status": status
-        }
-        auth_headers = {'Authorization': 'Token {}'.format(self.api_token)}
-        response = requests.get(self.build_url(endpoint),
-                                headers=auth_headers, params=data)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise SiteConfigurationError((
-                'Something went wrong with the site configuration API '
-                '`v1/configuration/` with status_code="{}" body="{}"'
-            ).format(response.status_code, response.content))
+        })
 
     def override_configs(self, site_uuid: Union[str, uuid.UUID], configs):
         """
@@ -117,16 +113,5 @@ class Client:
         This uses the v0 API which should be deprecated after the initial
         rollout.
         """
-        endpoint = 'v0/configuration-override/{}/'.format(site_uuid)
-        auth_headers = {'Authorization': 'Token {}'.format(self.api_token),
-                        'content-type': 'application/json'}
-        response = requests.put(self.build_url(endpoint),
-                                data=json.dumps(configs),
-                                headers=auth_headers)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise SiteConfigurationError((
-                'Something went wrong with the site configuration API '
-                '`v0/configuration-override/` with status_code="{}" body="{}"'
-            ).format(response.status_code, response.content))
+        api_endpoint = 'v0/configuration-override/{}/'.format(site_uuid)
+        return self.request('put', url_path=api_endpoint, json=configs)

@@ -108,13 +108,36 @@ def site_config_client():
     return client
 
 
-def test_url(site_config_client):
-    site_endpoint = site_config_client.build_url('v1/site/')
-    assert site_endpoint == "http://service/v1/site/"
-
-
 def test_client_has_token(site_config_client):
     assert site_config_client.api_token, 'Client should have an API token'
+
+
+def test_create_site(site_config_client, requests_mock):
+    headers = {'Authorization': '{}'.format(site_config_client.api_token)}
+    uuid = 'f12293e5-46b1-46f0'
+    site_path = 'http://service/v1/site/'
+    requests_mock.post(site_path, json={'site_uuid': uuid},
+                       headers=headers, status_code=201)
+    new_site = site_config_client.create_site(domain_name='example.com', site_uuid=uuid)
+    assert new_site == {'site_uuid': uuid}
+    history = requests_mock.request_history[0]
+    assert history.headers.get('Authorization') == 'Token some-token', (
+        'API Token passed in Authorization header')
+
+
+def test_create_site_with_error(site_config_client, requests_mock):
+    headers = {'Authorization': '{}'.format(site_config_client.api_token)}
+
+    site_path = 'http://service/v1/site/'
+    requests_mock.post(site_path, json={'site_uuid': 'f12293e5-46b1-46f0'},
+                       headers=headers, status_code=400)
+
+    with pytest.raises(SiteConfigurationError):
+        site_config_client.create_site(domain_name='example.com')
+
+    history = requests_mock.request_history[0]
+    assert history.headers.get('Authorization') == 'Token some-token', (
+        'API Token passed in Authorization header')
 
 
 def test_list_sites(site_config_client, requests_mock):
