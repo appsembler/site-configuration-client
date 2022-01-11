@@ -3,6 +3,7 @@ Tests for adapter
 """
 import pytest
 from unittest.mock import Mock
+from collections import OrderedDict
 
 
 CONFIGS = {
@@ -11,13 +12,16 @@ CONFIGS = {
     },
     "status": "live",
     "configuration": {
-        "css": {
-            "selected_font": "lato",
-            "text_color": "#0a0a0a",
-            "header_logo_height": "110",
-            "header_buttons_color": "#164be0",
-            "header_font_size": "17",
-        },
+        "css": OrderedDict(
+            # Just like a normal dict, but makes tests less flaky
+            (
+                ("selected_font", ["lato", "lato"]),
+                ("text_color", ["#0a0a0a", "#0a0a0a"]),
+                ("header_logo_height", ["110", "110"]),
+                ("header_buttons_color", ["#164be0", "#164be0"]),
+                ("header_font_size", ["17", "17"]),
+            )
+        ),
         "page": {
             "course-card": "course-tile-01",
             "privacy": {
@@ -67,7 +71,14 @@ def test_adapater(settings):
     assert adapter.get_value('SEGMENT_KEY') == 'so secret'
 
     css_vars = adapter.get_amc_v1_theme_css_variables()
-    assert css_vars == CONFIGS['configuration']['css']
+    # This change is temporary til we migrate off AMC and its edx-customers-theme
+    assert css_vars == [
+        ["selected_font", ["lato", "lato"]],
+        ["text_color", ["#0a0a0a", "#0a0a0a"]],
+        ["header_logo_height", ["110", "110"]],
+        ["header_buttons_color", ["#164be0", "#164be0"]],
+        ["header_font_size", ["17", "17"]],
+    ], 'get_amc_v1_theme_css_variables should return AMC-like variables'
 
     privacy_page_vars = adapter.get_amc_v1_page('privacy')
     assert privacy_page_vars == CONFIGS['configuration']['page']['privacy']

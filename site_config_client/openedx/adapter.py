@@ -38,9 +38,21 @@ class SiteConfigAdapter:
         return openedx_compatible_json
 
     def get_amc_v1_theme_css_variables(self):
+        """
+        Returns an Open edX AMC v1 theme compatible sass variables.
+
+        Note: This function assumes that all variables are compatible with v1 theme.
+        """
         config = self.get_backend_configs()['configuration']
-        openedx_theme_compatible_css_vars = config['css']
-        # NOTE: This function assumes that all varialbes are compativle with v1 theme.
+
+        # Imitates the values in edX's SiteConfiguration sass_variables
+        openedx_theme_compatible_css_vars = [
+            # Note: The usual AMC produced format is key --> [value, default]
+            #       The second value is mostly unused by Open edX can be
+            #       set as [value, default].
+            [key, val]
+            for key, val in config['css'].items()
+        ]
         return openedx_theme_compatible_css_vars
 
     def get_amc_v1_page(self, page_name, default=None):
