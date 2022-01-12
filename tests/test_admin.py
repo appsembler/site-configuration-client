@@ -11,5 +11,5 @@ def test_feature_flag_admin():
     """
     from site_config_client.admin import SiteConfigClientEnabledAdmin
 
-    assert SiteConfigClientEnabledAdmin.list_display == ['site_uuid']
-    assert SiteConfigClientEnabledAdmin.search_fields == ['site_uuid']
+    assert SiteConfigClientEnabledAdmin.list_display == ['site_uuid', 'note']
+    assert SiteConfigClientEnabledAdmin.search_fields == ['site_uuid', 'note']

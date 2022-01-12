@@ -13,5 +13,5 @@ class SiteConfigClientEnabledAdmin(admin.ModelAdmin):
     Admin interface for SiteConfigClientEnabled.
     """
 
-    list_display = ['site_uuid']
-    search_fields = ['site_uuid']
+    list_display = ['site_uuid', 'note']
+    search_fields = ['site_uuid', 'note']
