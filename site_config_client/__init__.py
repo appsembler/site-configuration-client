@@ -16,7 +16,7 @@ class Client:
         self.api_token = api_token
         self.read_only_storage = read_only_storage
         self.cache = cache
-        self.request_timeout = request_timeout,
+        self.request_timeout = request_timeout
 
     def request(self, method, url_path, success_status_code=200, **kwargs):
         """

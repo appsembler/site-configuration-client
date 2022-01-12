@@ -92,11 +92,13 @@ def test_client():
     bucket = "http://storage.googleapis.com/appsembler/site_config"
     c = Client(base_url=base,
                api_token=token,
-               read_only_storage=bucket)
+               read_only_storage=bucket,
+               request_timeout=100,)
 
     assert c.base_url == base
     assert c.api_token == token
     assert c.read_only_storage == bucket
+    assert c.request_timeout == 100, 'should not be a tuple'
 
 
 @pytest.fixture
