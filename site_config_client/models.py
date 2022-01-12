@@ -16,3 +16,4 @@ class SiteConfigClientEnabled(models.Model):
         app_label = 'site_config_client'
 
     site_uuid = models.UUIDField(verbose_name='UUID of the site the client enabled for.', unique=True)
+    note = models.CharField(verbose_name='Note for the the admin.', max_length=255)
