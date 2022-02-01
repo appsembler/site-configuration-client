@@ -31,7 +31,7 @@ class GoogleCloudStorage:
             log.warning('File path not found: %s', file_path)
             return None
 
-    def upload_css(self, domain, sass_contents, file_path):
+    def upload_css(self, domain, sass_contents):
         """
         Upload sass configs to cloud storage bucket.
         """
