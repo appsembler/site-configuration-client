@@ -13,6 +13,12 @@ class SiteConfigAdapter:
 
     backend_configs = None
 
+    TYPE_SETTING = 'setting'
+    TYPE_SECRET = 'secret'  # nosec
+    TYPE_ADMIN = 'admin'
+    TYPE_PAGE = 'page'
+    TYPE_CSS = 'css'
+
     def __init__(self, site_uuid):
         self.site_uuid = site_uuid
 
@@ -22,20 +28,10 @@ class SiteConfigAdapter:
             self.backend_configs = client.get_backend_configs(self.site_uuid, status)
         return self.backend_configs
 
-    def get_value(self, name, default=None):
-        """
-        Returns config value for config type `setting`.
-        """
-        site_values = self.get_site_values()
-        return site_values.get(name, default)
-
-    def get_site_values(self):
-        config = self.get_backend_configs()['configuration']
-        openedx_compatible_json = config['setting']
-
-        # TODO: Update our segment classes to use secrets and remove this line
-        openedx_compatible_json['SEGMENT_KEY'] = config['secret'].get('SEGMENT_KEY')
-        return openedx_compatible_json
+    def get_value_of_type(self, config_type, name, default):
+        all_configs = self.get_backend_configs()['configuration']
+        type_configs = all_configs[config_type]
+        return type_configs.get(name, default)
 
     def get_amc_v1_theme_css_variables(self):
         """
@@ -51,11 +47,6 @@ class SiteConfigAdapter:
             #       The second value is mostly unused by Open edX can be
             #       set as [value, default].
             [key, val]
-            for key, val in config['css'].items()
+            for key, val in config[self.TYPE_CSS].items()
         ]
         return openedx_theme_compatible_css_vars
-
-    def get_amc_v1_page(self, page_name, default=None):
-        config = self.get_backend_configs()['configuration']
-        openedx_theme_compatible_page_content = config['page'].get(page_name, default)
-        return openedx_theme_compatible_page_content

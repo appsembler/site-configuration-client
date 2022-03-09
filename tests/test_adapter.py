@@ -66,9 +66,9 @@ def test_adapater(settings):
 
     assert adapter.get_backend_configs() == CONFIGS
 
-    setting_platform_name = adapter.get_value('PLATFORM_NAME', None)
+    setting_platform_name = adapter.get_value_of_type('setting', 'PLATFORM_NAME', None)
     assert setting_platform_name == CONFIGS['configuration']['setting']['PLATFORM_NAME']
-    assert adapter.get_value('SEGMENT_KEY') == 'so secret'
+    assert adapter.get_value_of_type('secret', 'SEGMENT_KEY', None) == 'so secret'
 
     css_vars = adapter.get_amc_v1_theme_css_variables()
     # This change is temporary til we migrate off AMC and its edx-customers-theme
@@ -80,10 +80,10 @@ def test_adapater(settings):
         ["header_font_size", ["17", "17"]],
     ], 'get_amc_v1_theme_css_variables should return AMC-like variables'
 
-    privacy_page_vars = adapter.get_amc_v1_page('privacy')
+    privacy_page_vars = adapter.get_value_of_type('page', 'privacy', None)
     assert privacy_page_vars == CONFIGS['configuration']['page']['privacy']
 
-    assert adapter.get_amc_v1_page('non_existent') is None, 'Should default to None'
-    assert adapter.get_amc_v1_page('non_existent', {'title': 'default'}) == {
+    assert adapter.get_value_of_type('page', 'non_existent', None) is None, 'Should default to None'
+    assert adapter.get_value_of_type('page', 'non_existent', {'title': 'default'}) == {
         'title': 'default',
     }, 'Should has a default'
