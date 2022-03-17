@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- Note: Update the `Unreleased link` after adding a new release -->
 
-## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.1.2...HEAD)
+## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.1.3...HEAD)
+
+## [0.1.2](https://github.com/appsembler/site-configuration-client/compare/v0.1.2...v0.1.3) - 2022-03-17
+ - added enable_feature_for_site feature helper
 
 ## [0.1.2](https://github.com/appsembler/site-configuration-client/compare/v0.1.1...v0.1.2) - 2022-03-16
  - publish to pypi

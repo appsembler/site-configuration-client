@@ -15,6 +15,21 @@ def is_feature_enabled():
     return enabled_globally
 
 
+def enable_feature_for_site(site_uuid, note=''):
+    """
+    Enable the site configuration client for a site by site_uuid.
+
+    Returns: whether a new flag is created or not.
+    """
+    _, created = SiteConfigClientEnabled.objects.get_or_create(
+        site_uuid=site_uuid,
+        defaults={
+            'note': note,
+        }
+    )
+    return created
+
+
 def is_feature_enabled_for_site(site_uuid):
     """
     Checks if feature is globally enabled OR for the specific site.
