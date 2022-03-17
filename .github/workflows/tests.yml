@@ -16,16 +16,19 @@ jobs:
           - 3.5
           - 3.9
         tox-env:
-          - flake8
-          - bandit
           - py3
           - py3-django
           - py3-openedx
+        include:
+          - python-version: 3.5
+            tox-env: flake8
+          - python-version: 3.9
+            tox-env: bandit
 
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -42,7 +45,7 @@ jobs:
         with:
           name: coverage-data
           path: "*.coverage.*"
-        if: ${{ startsWith(matrix.tox-env, 'py3') }}
+          if-no-files-found: ignore
 
   coverage:
     name: Combine and check coverage
@@ -50,7 +53,7 @@ jobs:
     needs: tests
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v3
         with:
           # Use latest, so it understands all syntax.
           python-version: '3.10'
