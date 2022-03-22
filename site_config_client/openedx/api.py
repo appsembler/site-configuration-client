@@ -14,6 +14,13 @@ External Open edX Python API helpers goes here.
 
 
 try:
+    from crum import get_current_request
+except ImportError:
+    # Silence the initial import error, but runtime errors will occur in tests and non-Open edX environments.
+    # In tests, `get_current_request` can be mocked.
+    get_current_request = None
+
+try:
     from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
 except ImportError:
     # Silence the initial import error, but runtime errors will occur in tests and non-Open edX environments.
@@ -29,6 +36,25 @@ def get_current_configuration():
     Gets current site configuration.
     """
     return configuration_helpers.get_current_site_configuration()
+
+
+def get_current_site_config_client_adapter(request=None):
+    if not request:
+        request = get_current_request()
+
+    if not request:
+        raise RuntimeError('get_current_site_config_client_adapter: request needs to be provided')
+
+    api_adapter = getattr(request, 'site_config_client_adapter', None)
+    if not api_adapter:
+        # Tahoe: Import is placed here to avoid model import at project startup
+        from openedx.core.djangoapps.appsembler.sites import (
+            site_config_client_helpers as site_helpers,
+        )
+        if site_helpers.is_enabled_for_site(instance.site):
+            api_adapter = SiteConfigAdapter(uuid)
+
+    return api_adapter
 
 
 def get_setting_value(name, default=None, site_configuration=None):
