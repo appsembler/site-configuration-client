@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='site-configuration-client',
-    version='0.1.3',
+    version='0.1.4',
     description='Python client library for Site Configuration API',
     classifiers=[
         "Intended Audience :: Developers",
