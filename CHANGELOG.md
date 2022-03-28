@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- Note: Update the `Unreleased link` after adding a new release -->
 
-## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.1.3...HEAD)
+## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.1.4...HEAD)
+
+## [0.1.3](https://github.com/appsembler/site-configuration-client/compare/v0.1.3...v0.1.4) - 2022-03-23
+ - added `openedx.api` for getting individual values for the current site
 
 ## [0.1.3](https://github.com/appsembler/site-configuration-client/compare/v0.1.2...v0.1.3) - 2022-03-17
  - added enable_feature_for_site feature helper
