@@ -36,7 +36,9 @@ def get_admin_value(name, default=None, site_configuration=None):
     if not site_configuration:
         site_configuration = get_current_configuration()
 
-    return site_configuration.get_admin_setting(name, default)
+    if site_configuration:
+        return site_configuration.get_admin_setting(name, default)
+    return default
 
 
 def get_secret_value(name, default=None, site_configuration=None):
@@ -45,11 +47,12 @@ def get_secret_value(name, default=None, site_configuration=None):
 
     Proxy for `site_configuration.get_secret_value` until site_configuration is deprecated.
     """
-
     if not site_configuration:
         site_configuration = get_current_configuration()
 
-    return site_configuration.get_secret_value(name, default)
+    if site_configuration:
+        return site_configuration.get_secret_value(name, default)
+    return default
 
 
 def get_setting_value(name, default=None, site_configuration=None):
@@ -61,7 +64,9 @@ def get_setting_value(name, default=None, site_configuration=None):
     if not site_configuration:
         site_configuration = get_current_configuration()
 
-    return site_configuration.get_value(name, default)
+    if site_configuration:
+        return site_configuration.get_value(name, default)
+    return default
 
 
 def get_page_value(name, default=None, site_configuration=None):
@@ -73,4 +78,6 @@ def get_page_value(name, default=None, site_configuration=None):
     if not site_configuration:
         site_configuration = get_current_configuration()
 
-    return site_configuration.get_page_content(name, default)
+    if site_configuration:
+        return site_configuration.get_page_content(name, default)
+    return default
