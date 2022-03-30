@@ -75,3 +75,17 @@ def test_get_page_value():
         page_value = openedx_api.get_page_value('about', {})
     assert page_value == '{"title": "About page"}'
     current_config.get_page_content.assert_called_with('about', {})
+
+
+@pytest.mark.openedx
+@with_current_configs(current_config=None)  # Simulate an environment with no current configuration.
+def test_use_default_on_missing_site_configuration():
+    """
+    Ensure all openedx_api helpers return `default` if `site_configuration` is missing.
+
+    This is useful to return `None` for tests and when running on Open edX's main site.
+    """
+    assert openedx_api.get_secret_value('TEST_SECRET', 'default_secret') == 'default_secret'
+    assert openedx_api.get_admin_value('TEST_CONFIG', 'dummy-default') == 'dummy-default'
+    assert openedx_api.get_page_value('TEST_PAGE', 'dummy_page_content') == 'dummy_page_content'
+    assert openedx_api.get_setting_value('CUSTOMER_ID', 'dummy-customer') == 'dummy-customer'
