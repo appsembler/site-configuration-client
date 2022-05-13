@@ -117,10 +117,10 @@ def test_client_has_token(site_config_client):
 def test_create_site(site_config_client, requests_mock):
     headers = {'Authorization': '{}'.format(site_config_client.api_token)}
     uuid = 'f12293e5-46b1-46f0'
-    site_path = 'http://service/v1/site/'
+    site_path = 'http://service/v1/environment/staging/site/'
     requests_mock.post(site_path, json={'site_uuid': uuid},
                        headers=headers, status_code=201)
-    new_site = site_config_client.create_site(domain_name='example.com', site_uuid=uuid)
+    new_site = site_config_client.create_site(domain_name='example.com', environment='staging', site_uuid=uuid)
     assert new_site == {'site_uuid': uuid}
     history = requests_mock.request_history[0]
     assert history.headers.get('Authorization') == 'Token some-token', (
@@ -130,12 +130,12 @@ def test_create_site(site_config_client, requests_mock):
 def test_create_site_with_error(site_config_client, requests_mock):
     headers = {'Authorization': '{}'.format(site_config_client.api_token)}
 
-    site_path = 'http://service/v1/site/'
+    site_path = 'http://service/v1/environment/staging/site/'
     requests_mock.post(site_path, json={'site_uuid': 'f12293e5-46b1-46f0'},
                        headers=headers, status_code=400)
 
     with pytest.raises(SiteConfigurationError):
-        site_config_client.create_site(domain_name='example.com')
+        site_config_client.create_site(domain_name='example.com', environment='staging')
 
     history = requests_mock.request_history[0]
     assert history.headers.get('Authorization') == 'Token some-token', (
@@ -146,9 +146,9 @@ def test_list_sites(site_config_client, requests_mock):
     headers = {'Authorization': '{}'.
                format(site_config_client.api_token)}
 
-    site_path = "http://service/v1/site/"
+    site_path = "http://service/v1/environment/staging/site/"
     requests_mock.get(site_path, json=SITES, headers=headers, status_code=200)
-    response_sites = site_config_client.list_sites()
+    response_sites = site_config_client.list_sites(environment='staging')
     assert response_sites == SITES
     history = requests_mock.request_history[0]
     assert history.headers.get("Authorization") == "Token some-token", (
@@ -156,21 +156,21 @@ def test_list_sites(site_config_client, requests_mock):
 
 
 def test_list_sites_with_error(site_config_client, requests_mock):
-    site_path = "http://service/v1/site/"
+    site_path = "http://service/v1/environment/staging/site/"
     requests_mock.get(site_path, json=SITES, status_code=404)
 
     with pytest.raises(SiteConfigurationError):
-        site_config_client.list_sites()
+        site_config_client.list_sites(environment='staging')
 
 
 def test_list_active_sites(site_config_client, requests_mock):
     headers = {'Authorization': '{}'.
                format(site_config_client.api_token)}
 
-    active_sites_path = "http://service/v1/site/?is_active=True"
+    active_sites_path = "http://service/v1/environment/staging/site/?is_active=True"
     requests_mock.get(active_sites_path, json=SITES, headers=headers,
                       status_code=200)
-    response_active_sites = site_config_client.list_active_sites()
+    response_active_sites = site_config_client.list_active_sites(environment='staging')
     assert response_active_sites == SITES
     history = requests_mock.request_history[0]
     assert history.headers.get("Authorization") == "Token some-token", (
@@ -178,11 +178,11 @@ def test_list_active_sites(site_config_client, requests_mock):
 
 
 def test_list_active_sites_error(site_config_client, requests_mock):
-    active_sites_path = "http://service/v1/site/?is_active=True"
+    active_sites_path = "http://service/v1/environment/staging/site/?is_active=True"
     requests_mock.get(active_sites_path, json=SITES, status_code=404)
 
     with pytest.raises(SiteConfigurationError):
-        site_config_client.list_active_sites()
+        site_config_client.list_active_sites(environment='staging')
 
 
 def test_get_backend_configs(requests_mock, site_config_client):
@@ -190,12 +190,12 @@ def test_get_backend_configs(requests_mock, site_config_client):
                format(site_config_client.api_token)}
 
     backend_draft_configs_path = (
-        'http://service/v1/combined-configuration/backend/{}/draft/'
+        'http://service/v1/environment/staging/combined-configuration/backend/{}/draft/'
         .format(PARAMS['uuid']))
     requests_mock.get(backend_draft_configs_path,
                       json=CONFIGS, headers=headers, status_code=200)
     response_configs = site_config_client.get_backend_configs(
-        site_uuid=PARAMS['uuid'], status='draft')
+        site_uuid=PARAMS['uuid'], status='draft', environment='staging')
     assert response_configs == CONFIGS, (
         'Neither cache nor google cloud storage configured')
     history = requests_mock.request_history[0]
@@ -205,21 +205,21 @@ def test_get_backend_configs(requests_mock, site_config_client):
 
 def test_get_backend_configs_error(requests_mock, site_config_client):
     backend_draft_configs_path = (
-        'http://service/v1/combined-configuration/backend/{}/draft/'
+        'http://service/v1/environment/staging/combined-configuration/backend/{}/draft/'
         .format(PARAMS['uuid']))
     requests_mock.get(backend_draft_configs_path,
                       json=CONFIGS, status_code=404)
 
     with pytest.raises(SiteConfigurationError):
         site_config_client.get_backend_configs(
-            site_uuid=PARAMS['uuid'], status='draft')
+            site_uuid=PARAMS['uuid'], status='draft', environment='staging')
 
 
 @pytest.mark.django
 def test_get_backend_configs_cache(requests_mock, site_config_client):
     site_config_client.cache = DjangoCache(cache_name='default')
     backend_draft_configs_path = (
-        'http://service/v1/combined-configuration/backend/{}/draft/'
+        'http://service/v1/environment/staging/combined-configuration/backend/{}/draft/'
         .format(PARAMS['uuid']))
     cache_key = 'site_config_client.{}.{}'.format(PARAMS['uuid'], 'draft')
     config = site_config_client.cache.get(key=cache_key)
@@ -230,13 +230,13 @@ def test_get_backend_configs_cache(requests_mock, site_config_client):
 
     # First read without cache
     fresh_configs = site_config_client.get_backend_configs(
-        site_uuid=PARAMS['uuid'], status='draft')
+        site_uuid=PARAMS['uuid'], status='draft', environment='staging')
     cache_config_value = site_config_client.cache.get(key=cache_key)
     assert cache_config_value == fresh_configs, 'Cache key has been set'
 
     # Second read with cache
     cached_configs = site_config_client.get_backend_configs(
-        site_uuid=PARAMS['uuid'], status='draft')
+        site_uuid=PARAMS['uuid'], status='draft', environment='staging')
     assert cached_configs == fresh_configs, 'Reading from cache returns the same result'
 
 
@@ -244,11 +244,12 @@ def test_get_config(requests_mock, site_config_client):
     headers = {'Authorization': '{}'.
                format(site_config_client.api_token)}
 
-    config_path = "http://service/v1/configuration/{}/".format(PARAMS['uuid'])
+    config_path = "http://service/v1/environment/staging/configuration/{}/".format(PARAMS['uuid'])
     requests_mock.get(config_path, json=SINGLE_CONFIG, headers=headers,
                       status_code=200)
     response_configs = site_config_client.get_config(
         site_uuid=PARAMS['uuid'],
+        environment='staging',
         type="setting",
         name="PLATFORM_NAME",
         status="live")
@@ -259,7 +260,7 @@ def test_get_config(requests_mock, site_config_client):
 
 
 def test_get_config_error(requests_mock, site_config_client):
-    config_path = "http://service/v1/configuration/{}/".format(PARAMS['uuid'])
+    config_path = "http://service/v1/environment/staging/configuration/{}/".format(PARAMS['uuid'])
 
     requests_mock.get(config_path,
                       json=SINGLE_CONFIG, status_code=404)
@@ -267,6 +268,7 @@ def test_get_config_error(requests_mock, site_config_client):
     with pytest.raises(SiteConfigurationError):
         site_config_client.get_config(
             site_uuid=PARAMS['uuid'],
+            environment='staging',
             type="setting",
             name="PLATFORM_NAME",
             status="live")

@@ -45,30 +45,32 @@ class Client:
                 body=response.content,
             ))
 
-    def create_site(self, domain_name, site_uuid=None):
+    def create_site(self, domain_name: str, environment: str, site_uuid=None):
         """
         Create a new site.
         """
         params = {'domain_name': domain_name}
         if site_uuid:
             params['uuid'] = site_uuid
+        url = 'v1/environment/{}/site/'.format(environment)
+        return self.request('post', url, success_status_code=201, json=params)
 
-        return self.request('post', 'v1/site/', success_status_code=201, json=params)
-
-    def list_sites(self):
+    def list_sites(self, environment: str):
         """
         Returns a list of all Sites
         """
-        return self.request('get', 'v1/site/')
+        url = 'v1/environment/{}/site/'.format(environment)
+        return self.request('get', url)
 
-    def list_active_sites(self):
+    def list_active_sites(self, environment: str):
         """
         Returns a list of all active Sites
         """
-        return self.request('get', 'v1/site/?is_active=True')
+        url = 'v1/environment/{}/site/?is_active=True'.format(environment)
+        return self.request('get', url)
 
     def get_backend_configs(self, site_uuid: Union[str, uuid.UUID],
-                            status: str):
+                            environment: str, status: str):
         """
         Returns a combination of Site information and `live` or `draft`
         Configurations (backend secrets included)
@@ -85,8 +87,8 @@ class Client:
             if config:
                 return config
 
-        api_endpoint = 'v1/combined-configuration/backend/{}/{}/'.format(
-            site_uuid, status
+        api_endpoint = 'v1/environment/{}/combined-configuration/backend/{}/{}/'.format(
+            environment, site_uuid, status
         )
         config = self.request('get', url_path=api_endpoint)
 
@@ -95,11 +97,11 @@ class Client:
         return config
 
     def get_config(self, site_uuid: Union[str, uuid.UUID],
-                   type: str, name: str, status: str):
+                   environment: str, type: str, name: str, status: str):
         """
         Returns a single configuration object for Site
         """
-        api_endpoint = 'v1/configuration/{}/'.format(site_uuid)
+        api_endpoint = 'v1/environment/{}/configuration/{}/'.format(environment, site_uuid)
         return self.request('get', url_path=api_endpoint, params={
             "type": type,
             "name": name,
