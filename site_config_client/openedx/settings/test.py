@@ -14,4 +14,5 @@ def plugin_settings(settings):
     settings.SITE_CONFIG_CLIENT = Client(
         base_url='http://localhost:14000/v1/client/',
         api_token=api_token,
+        environment='test',
     )

@@ -37,6 +37,7 @@ def plugin_settings(settings):
         settings.SITE_CONFIG_CLIENT = Client(
             base_url=settings.SITE_CONFIG_BASE_URL,
             api_token=settings.SITE_CONFIG_API_TOKEN,
+            environment=settings.SITE_CONFIG_ENVIRONMENT,
             read_only_storage=read_only_storage,
             cache=cache,
         )

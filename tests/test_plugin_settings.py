@@ -13,6 +13,7 @@ def test_plugin_production_settings():
         SITE_CONFIG_CACHE_NAME='default',
         SITE_CONFIG_CACHE_TIMEOUT=3600,
         SITE_CONFIG_BASE_URL="http://service",
+        SITE_CONFIG_ENVIRONMENT="staging",
         SITE_CONFIG_API_TOKEN="some-token",
         SITE_CONFIG_READ_ONLY_BUCKET="random-bucket",
     )
@@ -36,6 +37,7 @@ def test_plugin_production_settings_no_gcp(caplog):
         SITE_CONFIG_CACHE_NAME='default',
         SITE_CONFIG_CACHE_TIMEOUT=3600,
         SITE_CONFIG_BASE_URL="http://service",
+        SITE_CONFIG_ENVIRONMENT="staging",
         SITE_CONFIG_API_TOKEN="some-token",
         SITE_CONFIG_READ_ONLY_BUCKET=None,
     )

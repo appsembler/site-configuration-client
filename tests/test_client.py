@@ -90,13 +90,16 @@ def test_client():
     base = "http://127.0.0.1:8000"
     token = "abcaseasyas123"
     bucket = "http://storage.googleapis.com/appsembler/site_config"
+    environment = 'staging'
     c = Client(base_url=base,
                api_token=token,
+               environment=environment,
                read_only_storage=bucket,
                request_timeout=100,)
 
     assert c.base_url == base
     assert c.api_token == token
+    assert c.environment == environment
     assert c.read_only_storage == bucket
     assert c.request_timeout == 100, 'should not be a tuple'
 
@@ -106,6 +109,7 @@ def site_config_client():
     client = Client(
                 base_url="http://service",
                 api_token="some-token",
+                environment="staging",
     )
     return client
 
@@ -120,7 +124,8 @@ def test_create_site(site_config_client, requests_mock):
     site_path = 'http://service/v1/environment/staging/site/'
     requests_mock.post(site_path, json={'site_uuid': uuid},
                        headers=headers, status_code=201)
-    new_site = site_config_client.create_site(domain_name='example.com', environment='staging', site_uuid=uuid)
+    new_site = site_config_client.create_site(domain_name='example.com',
+                                              site_uuid=uuid)
     assert new_site == {'site_uuid': uuid}
     history = requests_mock.request_history[0]
     assert history.headers.get('Authorization') == 'Token some-token', (
@@ -135,7 +140,7 @@ def test_create_site_with_error(site_config_client, requests_mock):
                        headers=headers, status_code=400)
 
     with pytest.raises(SiteConfigurationError):
-        site_config_client.create_site(domain_name='example.com', environment='staging')
+        site_config_client.create_site(domain_name='example.com')
 
     history = requests_mock.request_history[0]
     assert history.headers.get('Authorization') == 'Token some-token', (
@@ -148,7 +153,7 @@ def test_list_sites(site_config_client, requests_mock):
 
     site_path = "http://service/v1/environment/staging/site/"
     requests_mock.get(site_path, json=SITES, headers=headers, status_code=200)
-    response_sites = site_config_client.list_sites(environment='staging')
+    response_sites = site_config_client.list_sites()
     assert response_sites == SITES
     history = requests_mock.request_history[0]
     assert history.headers.get("Authorization") == "Token some-token", (
@@ -160,7 +165,7 @@ def test_list_sites_with_error(site_config_client, requests_mock):
     requests_mock.get(site_path, json=SITES, status_code=404)
 
     with pytest.raises(SiteConfigurationError):
-        site_config_client.list_sites(environment='staging')
+        site_config_client.list_sites()
 
 
 def test_list_active_sites(site_config_client, requests_mock):
@@ -170,7 +175,7 @@ def test_list_active_sites(site_config_client, requests_mock):
     active_sites_path = "http://service/v1/environment/staging/site/?is_active=True"
     requests_mock.get(active_sites_path, json=SITES, headers=headers,
                       status_code=200)
-    response_active_sites = site_config_client.list_active_sites(environment='staging')
+    response_active_sites = site_config_client.list_active_sites()
     assert response_active_sites == SITES
     history = requests_mock.request_history[0]
     assert history.headers.get("Authorization") == "Token some-token", (
@@ -182,7 +187,7 @@ def test_list_active_sites_error(site_config_client, requests_mock):
     requests_mock.get(active_sites_path, json=SITES, status_code=404)
 
     with pytest.raises(SiteConfigurationError):
-        site_config_client.list_active_sites(environment='staging')
+        site_config_client.list_active_sites()
 
 
 def test_get_backend_configs(requests_mock, site_config_client):
@@ -195,7 +200,7 @@ def test_get_backend_configs(requests_mock, site_config_client):
     requests_mock.get(backend_draft_configs_path,
                       json=CONFIGS, headers=headers, status_code=200)
     response_configs = site_config_client.get_backend_configs(
-        site_uuid=PARAMS['uuid'], status='draft', environment='staging')
+        site_uuid=PARAMS['uuid'], status='draft')
     assert response_configs == CONFIGS, (
         'Neither cache nor google cloud storage configured')
     history = requests_mock.request_history[0]
@@ -212,7 +217,7 @@ def test_get_backend_configs_error(requests_mock, site_config_client):
 
     with pytest.raises(SiteConfigurationError):
         site_config_client.get_backend_configs(
-            site_uuid=PARAMS['uuid'], status='draft', environment='staging')
+            site_uuid=PARAMS['uuid'], status='draft')
 
 
 @pytest.mark.django
@@ -230,13 +235,13 @@ def test_get_backend_configs_cache(requests_mock, site_config_client):
 
     # First read without cache
     fresh_configs = site_config_client.get_backend_configs(
-        site_uuid=PARAMS['uuid'], status='draft', environment='staging')
+        site_uuid=PARAMS['uuid'], status='draft')
     cache_config_value = site_config_client.cache.get(key=cache_key)
     assert cache_config_value == fresh_configs, 'Cache key has been set'
 
     # Second read with cache
     cached_configs = site_config_client.get_backend_configs(
-        site_uuid=PARAMS['uuid'], status='draft', environment='staging')
+        site_uuid=PARAMS['uuid'], status='draft')
     assert cached_configs == fresh_configs, 'Reading from cache returns the same result'
 
 
@@ -249,7 +254,6 @@ def test_get_config(requests_mock, site_config_client):
                       status_code=200)
     response_configs = site_config_client.get_config(
         site_uuid=PARAMS['uuid'],
-        environment='staging',
         type="setting",
         name="PLATFORM_NAME",
         status="live")
@@ -268,7 +272,6 @@ def test_get_config_error(requests_mock, site_config_client):
     with pytest.raises(SiteConfigurationError):
         site_config_client.get_config(
             site_uuid=PARAMS['uuid'],
-            environment='staging',
             type="setting",
             name="PLATFORM_NAME",
             status="live")

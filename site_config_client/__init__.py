@@ -7,13 +7,14 @@ from .exceptions import SiteConfigurationError
 
 
 class Client:
-    def __init__(self, base_url, api_token,
+    def __init__(self, base_url, api_token, environment,
                  read_only_storage=None, cache=None, request_timeout=30):
         """
         Instantiate a new API Client
         """
         self.base_url = base_url
         self.api_token = api_token
+        self.environment = environment
         self.read_only_storage = read_only_storage
         self.cache = cache
         self.request_timeout = request_timeout
@@ -45,32 +46,32 @@ class Client:
                 body=response.content,
             ))
 
-    def create_site(self, domain_name: str, environment: str, site_uuid=None):
+    def create_site(self, domain_name: str, site_uuid=None):
         """
         Create a new site.
         """
         params = {'domain_name': domain_name}
         if site_uuid:
             params['uuid'] = site_uuid
-        url = 'v1/environment/{}/site/'.format(environment)
+        url = 'v1/environment/{}/site/'.format(self.environment)
         return self.request('post', url, success_status_code=201, json=params)
 
-    def list_sites(self, environment: str):
+    def list_sites(self):
         """
         Returns a list of all Sites
         """
-        url = 'v1/environment/{}/site/'.format(environment)
+        url = 'v1/environment/{}/site/'.format(self.environment)
         return self.request('get', url)
 
-    def list_active_sites(self, environment: str):
+    def list_active_sites(self):
         """
         Returns a list of all active Sites
         """
-        url = 'v1/environment/{}/site/?is_active=True'.format(environment)
+        url = 'v1/environment/{}/site/?is_active=True'.format(self.environment)
         return self.request('get', url)
 
     def get_backend_configs(self, site_uuid: Union[str, uuid.UUID],
-                            environment: str, status: str):
+                            status: str):
         """
         Returns a combination of Site information and `live` or `draft`
         Configurations (backend secrets included)
@@ -88,7 +89,7 @@ class Client:
                 return config
 
         api_endpoint = 'v1/environment/{}/combined-configuration/backend/{}/{}/'.format(
-            environment, site_uuid, status
+            self.environment, site_uuid, status
         )
         config = self.request('get', url_path=api_endpoint)
 
@@ -97,11 +98,11 @@ class Client:
         return config
 
     def get_config(self, site_uuid: Union[str, uuid.UUID],
-                   environment: str, type: str, name: str, status: str):
+                   type: str, name: str, status: str):
         """
         Returns a single configuration object for Site
         """
-        api_endpoint = 'v1/environment/{}/configuration/{}/'.format(environment, site_uuid)
+        api_endpoint = 'v1/environment/{}/configuration/{}/'.format(self.environment, site_uuid)
         return self.request('get', url_path=api_endpoint, params={
             "type": type,
             "name": name,
