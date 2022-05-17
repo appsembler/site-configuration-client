@@ -7,13 +7,14 @@ from .exceptions import SiteConfigurationError
 
 
 class Client:
-    def __init__(self, base_url, api_token,
+    def __init__(self, base_url, api_token, environment,
                  read_only_storage=None, cache=None, request_timeout=30):
         """
         Instantiate a new API Client
         """
         self.base_url = base_url
         self.api_token = api_token
+        self.environment = environment
         self.read_only_storage = read_only_storage
         self.cache = cache
         self.request_timeout = request_timeout
@@ -45,27 +46,29 @@ class Client:
                 body=response.content,
             ))
 
-    def create_site(self, domain_name, site_uuid=None):
+    def create_site(self, domain_name: str, site_uuid=None):
         """
         Create a new site.
         """
         params = {'domain_name': domain_name}
         if site_uuid:
             params['uuid'] = site_uuid
-
-        return self.request('post', 'v1/site/', success_status_code=201, json=params)
+        url = 'v1/environment/{}/site/'.format(self.environment)
+        return self.request('post', url, success_status_code=201, json=params)
 
     def list_sites(self):
         """
         Returns a list of all Sites
         """
-        return self.request('get', 'v1/site/')
+        url = 'v1/environment/{}/site/'.format(self.environment)
+        return self.request('get', url)
 
     def list_active_sites(self):
         """
         Returns a list of all active Sites
         """
-        return self.request('get', 'v1/site/?is_active=True')
+        url = 'v1/environment/{}/site/?is_active=True'.format(self.environment)
+        return self.request('get', url)
 
     def get_backend_configs(self, site_uuid: Union[str, uuid.UUID],
                             status: str):
@@ -85,8 +88,8 @@ class Client:
             if config:
                 return config
 
-        api_endpoint = 'v1/combined-configuration/backend/{}/{}/'.format(
-            site_uuid, status
+        api_endpoint = 'v1/environment/{}/combined-configuration/backend/{}/{}/'.format(
+            self.environment, site_uuid, status
         )
         config = self.request('get', url_path=api_endpoint)
 
@@ -99,7 +102,7 @@ class Client:
         """
         Returns a single configuration object for Site
         """
-        api_endpoint = 'v1/configuration/{}/'.format(site_uuid)
+        api_endpoint = 'v1/environment/{}/configuration/{}/'.format(self.environment, site_uuid)
         return self.request('get', url_path=api_endpoint, params={
             "type": type,
             "name": name,
