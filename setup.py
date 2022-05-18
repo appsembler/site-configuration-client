@@ -1,9 +1,16 @@
+import os
 from setuptools import find_packages, setup
+
+
+def read(fname):
+    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
 
 setup(
     name='site-configuration-client',
     version='0.1.6',
     description='Python client library for Site Configuration API',
+    long_description=read('README.rst'),
     classifiers=[
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
