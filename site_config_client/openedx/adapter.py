@@ -19,14 +19,23 @@ class SiteConfigAdapter:
     TYPE_PAGE = 'page'
     TYPE_CSS = 'css'
 
-    def __init__(self, site_uuid):
+    def __init__(self, site_uuid, status='live'):
         self.site_uuid = site_uuid
+        self.status = status
 
-    def get_backend_configs(self, status='live'):
+    def get_backend_configs(self):
         if not self.backend_configs:
             client = settings.SITE_CONFIG_CLIENT
-            self.backend_configs = client.get_backend_configs(self.site_uuid, status)
+            self.backend_configs = client.get_backend_configs(self.site_uuid, self.status)
         return self.backend_configs
+
+    def delete_backend_configs_cache(self):
+        """
+        Enforce getting a fresh entry for the current context/request and following ones.
+        """
+        self.backend_configs = None
+        client = settings.SITE_CONFIG_CLIENT
+        client.delete_cache_for_site(self.site_uuid, self.status)
 
     def get_value_of_type(self, config_type, name, default):
         all_configs = self.get_backend_configs()['configuration']

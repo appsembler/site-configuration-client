@@ -62,7 +62,7 @@ def test_adapater(settings):
     mock = Mock()
     mock.get_backend_configs.return_value = CONFIGS
     settings.SITE_CONFIG_CLIENT = mock
-    adapter = SiteConfigAdapter("77d4ee4e-6888-4965")
+    adapter = SiteConfigAdapter("77d4ee4e-6888-4965", "live")
 
     assert adapter.get_backend_configs() == CONFIGS
 
@@ -87,3 +87,7 @@ def test_adapater(settings):
     assert adapter.get_value_of_type('page', 'non_existent', {'title': 'default'}) == {
         'title': 'default',
     }, 'Should has a default'
+
+    assert adapter.backend_configs, 'Sanity check: in-memory cache should be available'
+    adapter.delete_backend_configs_cache()
+    assert not adapter.backend_configs, 'Should remove in-memory cache'
