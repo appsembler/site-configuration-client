@@ -21,5 +21,21 @@ It has few required and optional dependencies:
 For the exact versions please refer to both ``setup.py`` and the
 ``requirements`` directory.
 
+
+Installation
+============
+
+Install the ``site-configuration-client`` dependency from PyPi either via ``server-vars.yml`` or other build processes such as Docker.
+
+Add the following settings to ``server-vars.yml`` (or ``lms.yml`` depending on your deployment configuration).
+
+
+.. code:: yaml
+
+    SITE_CONFIG_BASE_URL: "https://siteconfig:14000/"
+    SITE_CONFIG_API_TOKEN: "api token goes here"
+    SITE_CONFIG_ENVIRONMENT: "development"
+
+
 .. |CI| image:: https://github.com/appsembler/site-configuration-client/actions/workflows/tests.yml/badge.svg
    :target: https://github.com/appsembler/site-configuration-client/actions/workflows/tests.yml
