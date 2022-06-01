@@ -1,6 +1,9 @@
 """
 Tests for Client
 """
+import json
+
+from unittest.mock import Mock
 import pytest
 
 from site_config_client import Client
@@ -223,26 +226,64 @@ def test_get_backend_configs_error(requests_mock, site_config_client):
 @pytest.mark.django
 def test_get_backend_configs_cache(requests_mock, site_config_client):
     site_config_client.cache = DjangoCache(cache_name='default')
-    backend_draft_configs_path = (
-        'http://service/v1/environment/staging/combined-configuration/backend/{}/draft/'
+    backend_live_configs_path = (
+        'http://service/v1/environment/staging/combined-configuration/backend/{}/live/'
         .format(PARAMS['uuid']))
-    cache_key = 'site_config_client.{}.{}'.format(PARAMS['uuid'], 'draft')
+    requests_mock.get(backend_live_configs_path,
+                      json=CONFIGS, status_code=200)
+
+    cache_key = 'site_config_client.backend.{}'.format(PARAMS['uuid'])
     config = site_config_client.cache.get(key=cache_key)
     assert config is None, 'Cache does not exist'
 
-    requests_mock.get(backend_draft_configs_path,
-                      json=CONFIGS, status_code=200)
-
     # First read without cache
     fresh_configs = site_config_client.get_backend_configs(
-        site_uuid=PARAMS['uuid'], status='draft')
+        site_uuid=PARAMS['uuid'], status='live')
     cache_config_value = site_config_client.cache.get(key=cache_key)
     assert cache_config_value == fresh_configs, 'Cache key has been set'
 
     # Second read with cache
     cached_configs = site_config_client.get_backend_configs(
-        site_uuid=PARAMS['uuid'], status='draft')
+        site_uuid=PARAMS['uuid'], status='live')
     assert cached_configs == fresh_configs, 'Reading from cache returns the same result'
+
+    # Remove the cache
+    site_config_client.delete_cache_for_site(site_uuid=PARAMS['uuid'], status='live')
+    assert not site_config_client.get_backend_configs_from_cache(
+        site_uuid=PARAMS['uuid'],
+        status='live',
+    ), 'Should be deleted'
+
+
+@pytest.mark.django
+def test_get_backend_configs_readonly_storage(requests_mock, site_config_client):
+    read_only_storage_configs = {
+        "site": {
+            "uuid": "77d4ee4e-6888-4965-b246-b8629ac65bce",
+            "domain_name": "croissant.edu",
+            "tier": "trial",
+            "always_active": "False",
+            "subscription_ends": "2021-10-31T16:44:45+0000",
+            "is_active": "True"
+        },
+        "status": "live",
+        "configuration": {}
+    }
+    storage = Mock()
+    storage.read.return_value = json.dumps(read_only_storage_configs)
+    site_config_client.read_only_storage = storage
+    backend_draft_configs_path = (
+        'http://service/v1/environment/staging/combined-configuration/backend/{}/draft/'
+        .format(PARAMS['uuid']))
+    requests_mock.get(backend_draft_configs_path,
+                      json=CONFIGS, status_code=200)
+
+    draft_configs = site_config_client.get_backend_configs(site_uuid=PARAMS['uuid'], status='draft')
+    assert draft_configs == CONFIGS, 'Should read draft configs from API directly without using the readonly storage'
+
+    live_configs = site_config_client.get_backend_configs(site_uuid=PARAMS['uuid'], status='live')
+    storage.read.assert_called_once_with('v1/backend_configs_live_{}.json'.format(PARAMS['uuid']))
+    assert live_configs == read_only_storage_configs
 
 
 def test_get_config(requests_mock, site_config_client):

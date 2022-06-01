@@ -29,3 +29,6 @@ class DjangoCache:
 
     def get(self, key):
         return self.get_django_cache().get(key)
+
+    def delete(self, key):
+        return self.get_django_cache().delete(key)
