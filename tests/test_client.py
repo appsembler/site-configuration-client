@@ -267,7 +267,7 @@ def test_get_backend_configs_readonly_storage(requests_mock, site_config_client)
             "is_active": "True"
         },
         "status": "live",
-        "configuration": {}
+        "configuration": {},
     }
     storage = Mock()
     storage.read.return_value = json.dumps(read_only_storage_configs)
@@ -282,7 +282,10 @@ def test_get_backend_configs_readonly_storage(requests_mock, site_config_client)
     assert draft_configs == CONFIGS, 'Should read draft configs from API directly without using the readonly storage'
 
     live_configs = site_config_client.get_backend_configs(site_uuid=PARAMS['uuid'], status='live')
-    storage.read.assert_called_once_with('v1/backend_configs_live_{}.json'.format(PARAMS['uuid']))
+    storage.read.assert_called_once_with('v2/{environment}/backend_configs_live_{site_uuid}.json'.format(
+        site_uuid=PARAMS['uuid'],
+        environment='staging',
+    ))
     assert live_configs == read_only_storage_configs
 
 
