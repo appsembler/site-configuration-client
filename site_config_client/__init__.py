@@ -92,7 +92,10 @@ class Client:
             # The read-only storage makes sense only for live (published) configs.
             return None
 
-        file_path = 'v1/backend_configs_live_{site_uuid}.json'.format(site_uuid=site_uuid)
+        file_path = 'v2/{environment}/backend_configs_live_{site_uuid}.json'.format(
+            environment=self.environment,
+            site_uuid=site_uuid,
+        )
 
         config_str = None
         if self.read_only_storage:

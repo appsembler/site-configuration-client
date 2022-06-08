@@ -8,7 +8,7 @@ def read(fname):
 
 setup(
     name='site-configuration-client',
-    version='0.1.8',
+    version='0.1.9',
     description='Python client library for Site Configuration API',
     long_description=read('README.rst'),
     classifiers=[
