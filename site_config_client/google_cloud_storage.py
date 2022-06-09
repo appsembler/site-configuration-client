@@ -25,8 +25,11 @@ class GoogleCloudStorage:
         If the file don't exists, it returns `None`.
         """
         blob = self.bucket.get_blob(file_path)
-        try:
-            return blob.download_as_bytes().decode('utf-8')
-        except NotFound:
-            log.warning('File path not found: %s', file_path)
-            return None
+        if blob:
+            try:
+                return blob.download_as_bytes().decode('utf-8')
+            except NotFound:
+                pass
+
+        log.info('File path not found: %s', file_path)
+        return None
