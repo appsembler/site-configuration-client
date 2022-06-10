@@ -2,7 +2,7 @@
 Test settings for the Open edX
 """
 
-from site_config_client import Client
+from site_config_client.client import Client
 
 
 def plugin_settings(settings):

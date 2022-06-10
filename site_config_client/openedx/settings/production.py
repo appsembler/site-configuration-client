@@ -3,7 +3,7 @@ Production settings for the Open edX
 """
 import logging
 
-from site_config_client import Client
+from site_config_client.client import Client
 from site_config_client.django_cache import DjangoCache
 
 
