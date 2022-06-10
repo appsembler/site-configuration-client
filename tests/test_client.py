@@ -6,7 +6,7 @@ import json
 from unittest.mock import Mock
 import pytest
 
-from site_config_client import Client
+from site_config_client.client import Client
 from site_config_client.django_cache import DjangoCache
 from site_config_client.exceptions import SiteConfigurationError
 
