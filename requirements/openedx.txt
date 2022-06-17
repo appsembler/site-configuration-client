@@ -1,2 +1,3 @@
 -r django.txt
+python-dateutil==2.8.1  # Juniper version. For date parsing.
 -e mocks/

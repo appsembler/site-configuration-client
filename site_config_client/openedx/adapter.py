@@ -1,6 +1,10 @@
 """
+An API adapter and in-memory cache for the Site Configuration backend configuration.
 """
+
 from django.conf import settings
+
+from dateutil import parser
 
 
 AMC_V1_STRUCTURE_VERSION = 'amc-v1'
@@ -48,3 +52,28 @@ class SiteConfigAdapter:
         """
         config = self.get_backend_configs()['configuration']
         return config[self.TYPE_CSS]
+
+    def get_site_info(self):
+        """
+        Get the site information from site config.
+
+        Return dict(
+          always_active: boolean
+          domain_name: string
+          environment: dict(name: string)
+          subscription_ends: date
+          tier: string
+          uuid: UUID
+        )
+
+        Note, is_active is not returned from the response since it can be outdated.
+        """
+        site_info = self.get_backend_configs()['site'].copy()  # Get a copy of the object to manipulate it.
+
+        # Remove `is_active` property to avoid caching it
+        site_info.pop('is_active', None)
+
+        # Convert the string to useful datetime object
+        site_info['subscription_ends'] = parser.parse(site_info['subscription_ends'])
+
+        return site_info

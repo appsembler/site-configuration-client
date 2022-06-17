@@ -8,6 +8,9 @@ from unittest.mock import Mock
 CONFIGS = {
     "site": {
         "uuid": "77d4ee4e-6888-4965-b246-b8629ac65bce",
+        "always_active": True,
+        "subscription_ends": "2021-11-12T15:30:43+0000",
+        "tier": "trial",
     },
     "status": "live",
     "configuration": {
@@ -82,3 +85,6 @@ def test_adapater(settings):
     assert adapter.backend_configs, 'Sanity check: in-memory cache should be available'
     adapter.delete_backend_configs_cache()
     assert not adapter.backend_configs, 'Should remove in-memory cache'
+
+    site_info = adapter.get_site_info()
+    assert site_info['subscription_ends'].year == 2021, 'should return a datetime object'
