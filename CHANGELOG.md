@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- Note: Update the `Unreleased link` after adding a new release -->
 
-## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.1.6...HEAD)
+## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.2.1...HEAD)
+
+
+## [0.2.1](https://github.com/appsembler/site-configuration-client/compare/v0.1.12...v0.2.1) - 2022-07-21
+ - support studio
+
+## v0.1.7 to v0.1.12
+TODO: add undocumented releases.
+
 
 ## [0.1.6](https://github.com/appsembler/site-configuration-client/compare/v0.1.5...v0.1.6) - 2022-05-17
  - added environment prefix
