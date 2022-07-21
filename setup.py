@@ -24,6 +24,9 @@ setup(
         'lms.djangoapp': [
             'site_config_client = site_config_client.apps:SiteConfigApp',
         ],
+        'cms.djangoapp': [
+            'site_config_client = site_config_client.apps:SiteConfigApp',
+        ],
     },
     url="https://github.com/appsembler/site-configuration-client"
 )
