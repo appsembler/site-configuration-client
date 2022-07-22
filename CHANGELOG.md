@@ -7,7 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- Note: Update the `Unreleased link` after adding a new release -->
 
-## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.1.6...HEAD)
+## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.2.1...HEAD)
+
+
+## [0.2.1](https://github.com/appsembler/site-configuration-client/compare/v0.1.12...v0.2.1) - 2022-07-21
+ - support studio
+
+## [0.1.12](https://github.com/appsembler/site-configuration-client/compare/v0.1.11...v0.1.12) - 2022-06-17
+ - use a better filename for the Client class
+ - site info for subscription info
+
+## [0.1.11](https://github.com/appsembler/site-configuration-client/compare/v0.1.10...v0.1.11) - 2022-06-09
+ - fix exception when bucket.get_blob returns None by
+
+## [0.1.10](https://github.com/appsembler/site-configuration-client/compare/v0.1.9...v0.1.10) - 2022-06-09
+ - return CSS as dictionary
+
+## [0.1.9](https://github.com/appsembler/site-configuration-client/compare/v0.1.8...v0.1.9) - 2022-06-08
+ - read json configs with environment prefix by
+
+## [0.1.8](https://github.com/appsembler/site-configuration-client/compare/v0.1.7...v0.1.8) - 2022-06-01
+ - pin google requirements to fix py35 incompatible packages
+ - document django configs in readme
+ - fixes for client cache and readonly storage
+
+## [0.1.7](https://github.com/appsembler/site-configuration-client/compare/v0.1.6...v0.1.7) - 2022-05-19
+ - attempt to fix pypi
+
 
 ## [0.1.6](https://github.com/appsembler/site-configuration-client/compare/v0.1.5...v0.1.6) - 2022-05-17
  - added environment prefix

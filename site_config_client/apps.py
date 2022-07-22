@@ -29,5 +29,11 @@ class SiteConfigApp(AppConfig):
                     SettingsType.TEST: {
                         PluginSettings.RELATIVE_PATH: 'openedx.settings.test'},
                 },
+                ProjectType.CMS: {
+                    SettingsType.PRODUCTION: {
+                        PluginSettings.RELATIVE_PATH: 'openedx.settings.production'},
+                    SettingsType.TEST: {
+                        PluginSettings.RELATIVE_PATH: 'openedx.settings.test'},
+                },
             },
         }

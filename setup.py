@@ -8,7 +8,7 @@ def read(fname):
 
 setup(
     name='site-configuration-client',
-    version='0.1.12',
+    version='0.2.1',
     description='Python client library for Site Configuration API',
     long_description=read('README.rst'),
     classifiers=[
@@ -22,6 +22,9 @@ setup(
     ],
     entry_points={
         'lms.djangoapp': [
+            'site_config_client = site_config_client.apps:SiteConfigApp',
+        ],
+        'cms.djangoapp': [
             'site_config_client = site_config_client.apps:SiteConfigApp',
         ],
     },
