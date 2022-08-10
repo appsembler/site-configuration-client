@@ -60,11 +60,12 @@ class Client:
                 body=response.content,
             ))
 
-    def create_site(self, domain_name: str, site_uuid=None):
+    def create_site(self, domain_name: str, site_uuid=None, params=None):
         """
         Create a new site.
         """
-        params = {'domain_name': domain_name}
+        params = params or {}
+        params['domain_name'] = domain_name
         if site_uuid:
             params['uuid'] = site_uuid
         url = 'v1/environment/{}/site/'.format(self.environment)
