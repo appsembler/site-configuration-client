@@ -1,6 +1,6 @@
 # Support both Python 3.5 and Python 3.9
 
-Django==3.2.14; python_version >= '3.9'
+Django==3.2.15; python_version >= '3.9'
 Django==2.2.24; python_version < '3.9'
 
 pytest-django>=3.8.0,<=4.4.0
