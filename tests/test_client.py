@@ -350,7 +350,7 @@ def test_override_configs(requests_mock, site_config_client):
                format(site_config_client.api_token)}
 
     override_path = (
-        "http://service/v0/configuration-override/{}/"
+        "http://service/v0/environment/staging/configuration-override/{}/"
         .format(PARAMS['uuid']))
     success_response = {
         "developer_message": "Configurations has been overriden successfully."
@@ -367,7 +367,7 @@ def test_override_configs(requests_mock, site_config_client):
 
 def test_override_configs_error(requests_mock, site_config_client):
     override_path = (
-        "http://service/v0/configuration-override/{}/"
+        "http://service/v0/environment/staging/configuration-override/{}/"
         .format(PARAMS['uuid']))
 
     requests_mock.put(override_path, status_code=500)

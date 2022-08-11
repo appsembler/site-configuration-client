@@ -188,5 +188,8 @@ class Client:
         This uses the v0 API which should be deprecated after the initial
         rollout.
         """
-        api_endpoint = 'v0/configuration-override/{}/'.format(site_uuid)
+        api_endpoint = 'v0/environment/{environment}/configuration-override/{site_uuid}/'.format(
+            environment=self.environment,
+            site_uuid=site_uuid,
+        )
         return self.request('put', url_path=api_endpoint, json=configs)
