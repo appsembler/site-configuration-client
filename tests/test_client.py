@@ -135,6 +135,30 @@ def test_create_site(site_config_client, requests_mock):
         'API Token passed in Authorization header')
 
 
+def test_create_site_with_params(site_config_client, requests_mock):
+    """
+    Tests that uuid is optional, and `params` can be used.
+    """
+    requests_mock.post(
+        'http://service/v1/environment/staging/site/',
+        json={},
+        headers={'Authorization': '{}'.format(site_config_client.api_token)},
+        status_code=201,
+    )
+    site_config_client.create_site(
+        domain_name='example.com',
+        params={
+            'tier': 'premium',
+        }
+    )
+    history = requests_mock.request_history[0]
+    request_json = json.loads(history.body.decode('utf-8'))
+    assert request_json == {
+        'domain_name': 'example.com',
+        'tier': 'premium',
+    }
+
+
 def test_create_site_with_error(site_config_client, requests_mock):
     headers = {'Authorization': '{}'.format(site_config_client.api_token)}
 

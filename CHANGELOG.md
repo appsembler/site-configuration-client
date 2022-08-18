@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.2.1...HEAD)
 
+## [0.2.2](https://github.com/appsembler/site-configuration-client/compare/v0.2.1...v0.2.2) - 2022-08-10
+ - `create_site` to accept tier info parameters
 
 ## [0.2.1](https://github.com/appsembler/site-configuration-client/compare/v0.1.12...v0.2.1) - 2022-07-21
  - support studio
