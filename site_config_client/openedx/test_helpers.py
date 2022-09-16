@@ -9,7 +9,7 @@ def override_site_config(config_type, **config_overrides):
     """
     Override site config settings for a specific type of configuration.
     """
-    def overrider_for_get_value_of_type(name, default=None, site_configuration=None):
+    def overrider_for_get_value_of_type(name, default=None, *_args, **_kwargs):
         return config_overrides.get(name, default)
 
     return patch(

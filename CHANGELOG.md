@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- Note: Update the `Unreleased link` after adding a new release -->
 
-## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.2.1...HEAD)
+## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.2.3...HEAD)
+
+## [0.2.3](https://github.com/appsembler/site-configuration-client/compare/v0.2.2...v0.2.3) - 2022-09-16
+ - Get `openedx.api` values for a specific Open edX site.
 
 ## [0.2.2](https://github.com/appsembler/site-configuration-client/compare/v0.2.1...v0.2.2) - 2022-08-10
  - `create_site` to accept tier info parameters

@@ -26,6 +26,32 @@ def with_current_configs(current_config):
 
 
 @pytest.mark.openedx
+def test_get_current_configuration_with_site():
+    """
+    Test get_current_configuration() with specific site passed
+    """
+    site_mock = Mock(configuration=object())
+    assert openedx_api.get_current_configuration(site=site_mock) is site_mock.configuration
+
+
+def test_get_current_configuration_with_config():
+    """
+    Test get_current_configuration() with specific site_configuration passed
+    """
+    configuration_mock = object()
+    assert openedx_api.get_current_configuration(site_configuration=configuration_mock) is configuration_mock
+
+
+def test_get_current_configuration():
+    """
+    Test get_current_configuration() without specific site_configuration/site passed
+    """
+    configuration_mock = object()
+    with with_current_configs(configuration_mock):
+        assert openedx_api.get_current_configuration() is configuration_mock, 'Should use `configuration_helpers`'
+
+
+@pytest.mark.openedx
 def test_get_admin_value():
     """
     Test `get_admin_value()` helper for `admin` type of configurations.
@@ -49,6 +75,17 @@ def test_get_secret_value():
         secret_value = openedx_api.get_secret_value('EMAIL_PASSWORD', 'default-pass')
     assert secret_value == 'password'
     current_config.get_secret_value.assert_called_with('EMAIL_PASSWORD', 'default-pass')
+
+
+@pytest.mark.openedx
+def test_get_secret_value_for_site():
+    """
+    Test `get_secret_value()` helper for `secret` type of configurations for a specific site.
+    """
+    site = Mock()
+    site.configuration.get_secret_value.return_value = 'password'
+    secret_value = openedx_api.get_secret_value('EMAIL_PASSWORD', 'default-pass', site=site)
+    assert secret_value == 'password', 'Should _not_ use the default value'
 
 
 @pytest.mark.openedx
