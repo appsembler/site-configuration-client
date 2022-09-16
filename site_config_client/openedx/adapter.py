@@ -17,6 +17,7 @@ class SiteConfigAdapter:
 
     backend_configs = None
 
+    TYPE_INTEGRATION = 'integration'
     TYPE_SETTING = 'setting'
     TYPE_SECRET = 'secret'  # nosec
     TYPE_ADMIN = 'admin'

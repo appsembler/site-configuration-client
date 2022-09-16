@@ -81,3 +81,16 @@ def get_page_value(name, default=None, site_configuration=None, site=None):
     if site_configuration:
         return site_configuration.get_page_content(name, default)
     return default
+
+
+def get_integration_value(name, default=None, site_configuration=None, site=None):
+    """
+    Get `integration` setting from the site configuration service.
+
+    Uses for `site_configuration` directly until site_configuration is deprecated.
+    """
+    site_configuration = get_current_configuration(site_configuration=site_configuration, site=site)
+
+    if site_configuration:
+        return site_configuration.get_integration_value(name, default)
+    return default
