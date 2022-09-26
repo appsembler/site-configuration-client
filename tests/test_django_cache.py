@@ -14,13 +14,29 @@ def django_cache_adapter(settings):
             'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         }
     }
-    return DjangoCache(cache_name='default')
+    return DjangoCache(cache_name='default', cache_timeout=100)
 
 
 @pytest.mark.django
 def test_empty_get(django_cache_adapter):
     cache_key = 'client.040e0ec3-2578-4fcf-b5db-030dadf68f30.live'
     assert django_cache_adapter.get(key=cache_key) is None
+
+
+@pytest.mark.django
+@pytest.mark.parametrize('params,expected_timeout,message', [
+    ({'cache_timeout': None}, 300, 'None defaults to 300'),
+    ({'cache_timeout': ''}, 300, 'Empty string --> 300'),
+    ({'cache_timeout': '600'}, 600, 'string is converted to int'),
+    ({'cache_timeout': 800}, 800, 'int 800 is kept as-is'),
+])
+def test_timeout(params, expected_timeout, message):
+    """
+    Ensure `cache_timeout` is can be configured with both int and str with sane defaults.
+    """
+    from site_config_client.django_cache import DjangoCache
+    cache = DjangoCache(cache_name='default', **params)
+    assert cache.cache_timeout == expected_timeout, message
 
 
 @pytest.mark.django

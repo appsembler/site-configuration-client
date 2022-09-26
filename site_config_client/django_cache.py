@@ -7,9 +7,12 @@ class DjangoCache:
     """
     Allows Site Configuration client to configure caching with Django
     """
-    def __init__(self, cache_name, cache_timeout=300):
+
+    DEFAULT_TIMEOUT = 300  # 5 minutes
+
+    def __init__(self, cache_name, cache_timeout):
         self.cache_name = cache_name
-        self.cache_timeout = cache_timeout
+        self.cache_timeout = int(cache_timeout or self.DEFAULT_TIMEOUT)
         self._django_cache = None
 
     def get_django_cache(self):
@@ -22,10 +25,7 @@ class DjangoCache:
         return self._django_cache
 
     def set(self, key, value):
-        kwargs = {}
-        if self.cache_timeout is not None:
-            kwargs['timeout'] = self.cache_timeout
-        return self.get_django_cache().set(key, value, **kwargs)
+        return self.get_django_cache().set(key, value, timeout=self.cache_timeout)
 
     def get(self, key):
         return self.get_django_cache().get(key)
