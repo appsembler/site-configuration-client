@@ -249,7 +249,7 @@ def test_get_backend_configs_error(requests_mock, site_config_client):
 
 @pytest.mark.django
 def test_get_backend_configs_cache(requests_mock, site_config_client):
-    site_config_client.cache = DjangoCache(cache_name='default')
+    site_config_client.cache = DjangoCache(cache_name='default', cache_timeout=300)
     backend_live_configs_path = (
         'http://service/v1/environment/staging/combined-configuration/backend/{}/live/'
         .format(PARAMS['uuid']))

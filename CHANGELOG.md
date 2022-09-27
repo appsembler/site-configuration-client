@@ -7,7 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- Note: Update the `Unreleased link` after adding a new release -->
 
-## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.2.3...HEAD)
+## [Unreleased](https://github.com/appsembler/tahoe-sites/compare/v0.2.4...HEAD)
+
+## [0.2.4](https://github.com/appsembler/site-configuration-client/compare/v0.2.3...v0.2.4) - 2022-09-27
+ - enforce a default 300sec timeout if `SITE_CONFIG_CACHE_TIMEOUT` is not set
+
 
 ## [0.2.3](https://github.com/appsembler/site-configuration-client/compare/v0.2.2...v0.2.3) - 2022-09-16
  - Get `openedx.api` values for a specific Open edX site.

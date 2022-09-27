@@ -60,6 +60,7 @@ def test_plugin_production_settings_no_client(caplog):
     settings = mock.Mock(
         SITE_CONFIG_BASE_URL=None,
         SITE_CONFIG_READ_ONLY_BUCKET=None,
+        SITE_CONFIG_CACHE_TIMEOUT=None,
     )
     plugin_settings(settings)
     assert settings.SITE_CONFIG_CLIENT, 'Client should not be initialized due to missing SITE_CONFIG_BASE_URL'
@@ -74,6 +75,7 @@ def test_plugin_test_settings(client):
 
     settings = mock.Mock(
         SITE_CONFIG_CLIENT=None,
+        SITE_CONFIG_CACHE_TIMEOUT='',
     )
 
     plugin_settings(settings)
